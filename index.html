@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0">
+<title>🏆 Álbum Panini Mundial 2026</title>
+<!-- iOS: permite "Agregar a pantalla de inicio" como app a pantalla completa -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Panini 26">
+<meta name="theme-color" content="#0a0a1a">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--red:#e8001c;--gold:#FFD700;--dark:#0a0a1a;--green:#00c853;--light:#e8edf5;--card:#111827}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{font-family:'Nunito',sans-serif;background:var(--dark);color:var(--light);min-height:100vh;min-height:-webkit-fill-available;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+/* iOS: respetar el notch / barra inferior (safe-area) */
+.hero{padding-top:max(20px,env(safe-area-inset-top))!important}
+.wrap{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+/* Las estampas y botones no se seleccionan ni hacen zoom por doble-tap */
+.s,.fbtn,.thdr,.spc-hdr,.reset,.iobtn{touch-action:manipulation}
+.hero{background:linear-gradient(135deg,#0a0a1a,#0d1b3e 40%,#1a0a2e);border-bottom:3px solid var(--gold);padding:20px 16px 16px;position:relative;overflow:hidden}
+.hero::before{content:"2026";position:absolute;right:-10px;top:-20px;font-family:'Bebas Neue',cursive;font-size:180px;color:rgba(255,215,0,0.05);pointer-events:none}
+.hero-inner{max-width:960px;margin:0 auto;display:flex;align-items:center;gap:14px}
+.trophy{font-size:52px;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.hero-text h1{font-family:'Bebas Neue',cursive;font-size:clamp(28px,6vw,52px);color:var(--gold);letter-spacing:2px;line-height:1}
+.hero-text p{font-size:13px;color:#8899bb;font-weight:600;margin-top:2px}
+.stats-bar{max-width:960px;margin:0 auto;padding:16px}
+.big-prog{background:rgba(255,255,255,0.06);border-radius:16px;padding:16px 20px;border:1px solid rgba(255,215,0,0.2)}
+.prog-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.prog-lbl{font-size:13px;color:#8899bb;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+.prog-pct{font-family:'Bebas Neue',cursive;font-size:36px;color:var(--gold);line-height:1}
+.prog-track{background:rgba(255,255,255,0.08);border-radius:20px;height:16px;overflow:hidden}
+.prog-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,#e8001c,#FFD700);transition:width .8s cubic-bezier(.4,0,.2,1)}
+.mini-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.mini-stat{background:rgba(255,255,255,0.04);border-radius:10px;padding:10px;text-align:center;border:1px solid rgba(255,255,255,0.08)}
+.mini-val{font-family:'Bebas Neue',cursive;font-size:26px;line-height:1}
+.green{color:var(--green)}.red{color:var(--red)}.gold{color:var(--gold)}
+.mini-lbl{font-size:10px;color:#667;font-weight:700;text-transform:uppercase;margin-top:2px}
+.controls{max-width:960px;margin:0 auto;padding:0 16px 12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.search{flex:1;min-width:180px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:9px 14px;color:#fff;font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;outline:none;transition:border-color .2s}
+.search:focus{border-color:var(--gold)}.search::placeholder{color:#445}
+.fbtn{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:9px 14px;color:#aac;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap}
+.fbtn:hover{border-color:var(--gold);color:var(--gold)}.fbtn.active{background:var(--gold);color:#000;border-color:var(--gold)}
+.wrap{max-width:960px;margin:0 auto;padding:0 16px 40px;display:flex;flex-direction:column;gap:10px}
+.grp-hdr{display:flex;align-items:center;gap:10px;padding:10px 4px 4px;flex-wrap:wrap}
+.grp-pill{background:linear-gradient(135deg,var(--red),#ff4444);color:#fff;font-family:'Bebas Neue',cursive;font-size:15px;padding:4px 14px;border-radius:20px;letter-spacing:1px;white-space:nowrap}
+.grp-teams{font-size:11px;color:#667;font-weight:700;flex:1}
+.grp-prog{font-size:11px;color:#8899bb;font-weight:700;white-space:nowrap}
+.spc{border-radius:16px;overflow:hidden;border:1px solid rgba(255,215,0,0.25);background:linear-gradient(135deg,rgba(255,215,0,0.08),rgba(255,215,0,0.02))}
+.spc.coca{border-color:rgba(232,0,28,0.3);background:linear-gradient(135deg,rgba(232,0,28,0.1),rgba(232,0,28,0.02))}
+.spc-hdr{padding:13px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none}
+.spc-icon{font-size:22px}
+.spc-title{font-family:'Bebas Neue',cursive;font-size:20px;color:var(--gold);letter-spacing:1px;flex:1}
+.spc.coca .spc-title{color:#ff7777}
+.spc-prog{font-size:12px;color:#8899bb;font-weight:700}
+.tcard{background:var(--card);border-radius:16px;border:1px solid rgba(255,255,255,0.07);overflow:hidden;transition:border-color .2s}
+.tcard:hover{border-color:rgba(255,255,255,0.15)}.tcard.done{border-color:rgba(0,200,83,0.35)}.tcard.hidden{display:none}
+.thdr{padding:12px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none}
+.tflag{font-size:24px;flex-shrink:0}
+.tflag img{width:30px;height:30px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px rgba(255,255,255,.15),0 1px 3px rgba(0,0,0,.4);background:#222;vertical-align:middle}
+.tinfo{flex:1}.tname{font-weight:800;font-size:15px;line-height:1.2}
+.tsub{font-size:11px;color:#556;font-weight:600;margin-top:2px}
+.tbar-wrap{flex:1;max-width:100px}
+.tbar{height:6px;background:rgba(255,255,255,0.08);border-radius:6px;overflow:hidden}
+.tbar-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,#e8001c,#FFD700);transition:width .4s}
+.tpct{font-size:11px;color:#8899bb;text-align:right;font-weight:700;margin-top:2px}
+.badge{width:28px;height:28px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:14px;opacity:0;transition:opacity .3s}
+.badge.on{opacity:1}
+.chev{color:#556;font-size:13px;transition:transform .3s}.chev.open{transform:rotate(180deg)}
+.panel{display:none;padding:8px 16px 16px;border-top:1px solid rgba(255,255,255,0.06);animation:fi .25s ease}
+.panel.open{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(68px,1fr));gap:6px}
+.s{background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.08);border-radius:10px;padding:6px 4px;text-align:center;cursor:pointer;transition:all .18s;position:relative;user-select:none}
+.s:hover{transform:scale(1.06);border-color:rgba(255,215,0,0.4)}
+.s.on{background:rgba(0,200,83,0.15);border-color:rgba(0,200,83,0.5)}
+.s.foil{background:linear-gradient(135deg,rgba(255,215,0,0.1),rgba(255,100,0,0.05));border-color:rgba(255,215,0,0.3)}
+.s.foil.on{background:linear-gradient(135deg,rgba(255,215,0,0.25),rgba(255,100,0,0.12));border-color:var(--gold)}
+.s.coca{background:linear-gradient(135deg,rgba(232,0,28,0.1),rgba(232,0,28,0.03));border-color:rgba(232,0,28,0.3)}
+.s.coca.on{background:rgba(232,0,28,0.2);border-color:rgba(232,0,28,0.7)}
+.sc{font-size:9px;color:#667;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+.sn{font-family:'Bebas Neue',cursive;font-size:18px;color:#ccd;line-height:1;margin:1px 0}
+.s.on .sn{color:var(--green)}.s.foil .sn{color:var(--gold)}.s.coca .sn{color:#ff9999}
+.sl{font-size:8px;color:#556;font-weight:700;line-height:1.2;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.s.on .sl{color:rgba(0,200,83,0.8)}
+.sck{position:absolute;top:3px;right:3px;font-size:10px;opacity:0;transition:opacity .2s}
+.s.on .sck{opacity:1}
+/* Boton "+repetida": solo visible cuando ya la tengo */
+.dadd{position:absolute;top:1px;left:2px;width:18px;height:18px;border-radius:50%;
+  background:rgba(255,215,0,0.18);color:var(--gold);font-size:14px;font-weight:900;line-height:17px;
+  text-align:center;opacity:0;transition:opacity .2s;cursor:pointer}
+.s.on .dadd{opacity:1}.dadd:hover{background:var(--gold);color:#000}
+/* Badge "×N" de repetidas (toca para bajar) */
+.dupb{position:absolute;bottom:2px;right:2px;background:#ff7b00;color:#fff;font-size:10px;font-weight:800;
+  padding:1px 5px;border-radius:9px;cursor:pointer;line-height:1.3;box-shadow:0 1px 2px rgba(0,0,0,.4)}
+.miss{margin-top:10px;padding:10px 12px;background:rgba(232,0,28,0.06);border:1px solid rgba(232,0,28,0.15);border-radius:10px}
+.miss-t{font-size:11px;color:#e8001c;font-weight:800;text-transform:uppercase;margin-bottom:6px;letter-spacing:1px}
+.miss-c{font-size:11px;color:#889;font-weight:600;line-height:1.6}
+.reset{display:block;margin:8px auto 0;background:transparent;border:1px solid rgba(255,0,0,0.2);color:rgba(255,100,100,0.6);border-radius:8px;padding:6px 16px;font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:all .2s}
+.reset:hover{border-color:red;color:red}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--green);color:#000;font-weight:800;font-size:13px;padding:10px 20px;border-radius:30px;z-index:9999;transition:transform .3s;pointer-events:none;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}.toast.red{background:var(--red);color:#fff}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9998;padding:20px;
+  align-items:center;justify-content:center}
+.modal.open{display:flex}
+.modal-box{background:var(--card);border:1px solid rgba(255,215,0,.3);border-radius:16px;max-width:520px;
+  width:100%;max-height:85vh;display:flex;flex-direction:column;overflow:hidden}
+.modal-hd{padding:14px 18px;display:flex;justify-content:space-between;align-items:center;
+  border-bottom:1px solid rgba(255,255,255,.08);font-family:'Bebas Neue',cursive;font-size:22px;color:var(--gold);letter-spacing:1px}
+.modal-x{cursor:pointer;color:#889;font-size:18px}
+.modal-body{padding:16px 18px;overflow-y:auto}
+.cbk{margin-bottom:16px}
+.cbk h4{font-size:13px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.cbk .codes{font-size:12px;color:#aab;font-weight:600;line-height:1.7;word-break:break-word;
+  background:rgba(255,255,255,.04);padding:10px;border-radius:8px;max-height:180px;overflow-y:auto}
+.cpy{display:inline-block;margin-top:8px;background:var(--gold);color:#000;border:0;border-radius:8px;
+  padding:7px 16px;font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="hero-inner">
+    <div class="trophy">🏆</div>
+    <div class="hero-text">
+      <h1>Álbum Panini<br>Mundial 2026</h1>
+      <p>🇺🇸 🇨🇦 🇲🇽 · 48 selecciones · Grupos A–L · Coca-Cola incluidas</p>
+    </div>
+  </div>
+</div>
+<div class="stats-bar">
+  <div class="big-prog">
+    <div class="prog-head"><span class="prog-lbl">Progreso total del álbum</span><span class="prog-pct" id="pPct">0%</span></div>
+    <div class="prog-track"><div class="prog-fill" id="pBar" style="width:0%"></div></div>
+    <div class="mini-stats">
+      <div class="mini-stat"><div class="mini-val green" id="pOwned">0</div><div class="mini-lbl">Tengo</div></div>
+      <div class="mini-stat"><div class="mini-val red" id="pMiss">0</div><div class="mini-lbl">Faltan</div></div>
+      <div class="mini-stat"><div class="mini-val gold" id="pTotal">0</div><div class="mini-lbl">Total</div></div>
+    </div>
+  </div>
+</div>
+<div class="controls">
+  <input class="search" id="qInput" type="text" placeholder="🔍 Buscar equipo o jugador..." oninput="filterAll()">
+  <button class="fbtn active" onclick="setF('all',this)">Todos</button>
+  <button class="fbtn" onclick="setF('miss',this)">Faltan</button>
+  <button class="fbtn" onclick="setF('done',this)">Completos</button>
+  <button class="fbtn iobtn" onclick="showCambios()" title="Lista para el puesto / cambios">🔁 Cambios</button>
+  <button class="fbtn iobtn" onclick="exportData()" title="Respaldar tu progreso">⬆️ Exportar</button>
+  <button class="fbtn iobtn" onclick="importData()" title="Restaurar progreso">⬇️ Importar</button>
+</div>
+<div class="modal" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box">
+    <div class="modal-hd"><span id="modalTitle">Cambios</span><span class="modal-x" onclick="closeModal()">✕</span></div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+<div class="wrap" id="wrap"></div>
+<div class="toast" id="toast"></div>
+<script>
+// ── DATA — verificado contra el álbum físico ──────────────────────────────────
+// Páginas del álbum: MEX=8, RSA=10, KOR=12, CZE=14, CAN=16, BIH=18, QAT=20,
+// SUI=22, BRA=24, MAR=26, HAI=28, SCO=30, USA=32, PAR=34, AUS=36, TUR=38,
+// GER=40, CUW=42, CIV=44, ECU=46, NED=48, JPN=50, SWE=52, TUN=54,
+// BEL=58, EGY=60, IRN=62, NZL=64, ESP=66, CPV=68, KSA=70, URU=72,
+// FRA=74, SEN=76, IRQ=78, NOR=80, ARG=82, ALG=84, AUT=86, JOR=88,
+// POR=90, COD=92, UZB=94, COL=96, ENG=98, CRO=100, GHA=102, PAN=104
+
+const INTRO={id:"INTRO",name:"Introducción & Historia FIFA",flag:"🌎",special:true,stickers:[
+  {code:"00",name:"Logo Panini",foil:true},
+  {code:"FWC1",name:"Emblema Oficial 1/2",foil:true},{code:"FWC2",name:"Emblema Oficial 2/2",foil:true},
+  {code:"FWC3",name:"Mascotas Oficiales",foil:true},{code:"FWC4",name:"Slogan Oficial",foil:true},
+  {code:"FWC5",name:"Balón Oficial",foil:true},
+  {code:"FWC6",name:"Canadá - Sede",foil:true},{code:"FWC7",name:"México - Sede",foil:true},{code:"FWC8",name:"USA - Sede",foil:true},
+  {code:"FWC9",name:"Italia 1934",foil:true},{code:"FWC10",name:"Uruguay 1950",foil:true},
+  {code:"FWC11",name:"Alemania Occ. 1954",foil:true},{code:"FWC12",name:"Brasil 1962",foil:true},
+  {code:"FWC13",name:"Alemania Occ. 1974",foil:true},{code:"FWC14",name:"Argentina 1986",foil:true},
+  {code:"FWC15",name:"Brasil 1994",foil:true},{code:"FWC16",name:"Brasil 2002",foil:true},
+  {code:"FWC17",name:"Italia 2006",foil:true},{code:"FWC18",name:"Alemania 2014",foil:true},
+  {code:"FWC19",name:"Argentina 2022",foil:true}
+]};
+
+// 14 estampillas Coca-Cola (verificadas por el hijo)
+const COCA={id:"COCA",name:"Estampillas Especiales Coca-Cola",flag:"🥤",special:true,isCoca:true,stickers:[
+  {code:"CC1",name:"Lamine Yamal (ESP)",coca:true},
+  {code:"CC2",name:"Joshua Kimmich (GER)",coca:true},
+  {code:"CC3",name:"Harry Kane (ENG)",coca:true},
+  {code:"CC4",name:"Santiago Giménez (MEX)",coca:true},
+  {code:"CC5",name:"Joško Gvardiol (CRO)",coca:true},
+  {code:"CC6",name:"Federico Valverde (URU)",coca:true},
+  {code:"CC7",name:"Jefferson Lerma (COL)",coca:true},
+  {code:"CC8",name:"Enner Valencia (ECU)",coca:true},
+  {code:"CC9",name:"Gabriel Magalhães (BRA)",coca:true},
+  {code:"CC10",name:"Virgil van Dijk (NED)",coca:true},
+  {code:"CC11",name:"Alphonso Davies (CAN)",coca:true},
+  {code:"CC12",name:"Emiliano Martínez (ARG)",coca:true},
+  {code:"CC13",name:"Raúl Jiménez (MEX)",coca:true},
+  {code:"CC14",name:"Lautaro Martínez (ARG)",coca:true}
+]};
+
+// GRUPOS — verificados contra la foto del álbum físico
+const GROUPS=[
+// A: MEX RSA KOR CZE
+{g:"A",label:"México · Sudáfrica · Corea del Sur · Chequia",teams:[
+  {id:"MEX",name:"México",flag:"🇲🇽",pg:8,st:[
+    {c:"MEX1",n:"Escudo",f:1},{c:"MEX2",n:"Luis Malagón"},{c:"MEX3",n:"Johan Vasquez"},
+    {c:"MEX4",n:"Jorge Sánchez"},{c:"MEX5",n:"Cesar Montes"},{c:"MEX6",n:"Jesus Gallardo"},
+    {c:"MEX7",n:"Israel Reyes"},{c:"MEX8",n:"Diego Lainez"},{c:"MEX9",n:"Carlos Rodriguez"},
+    {c:"MEX10",n:"Edson Alvarez"},{c:"MEX11",n:"Orbelin Pineda"},{c:"MEX12",n:"Marcel Ruiz"},
+    {c:"MEX13",n:"Foto Equipo"},{c:"MEX14",n:"Érick Sánchez"},{c:"MEX15",n:"Hirving Lozano"},
+    {c:"MEX16",n:"Santiago Giménez"},{c:"MEX17",n:"Raúl Jiménez"},{c:"MEX18",n:"Alexis Vega"},
+    {c:"MEX19",n:"Roberto Alvarado"},{c:"MEX20",n:"Cesar Huerta"}]},
+  {id:"RSA",name:"Sudáfrica",flag:"🇿🇦",pg:10,st:[
+    {c:"RSA1",n:"Escudo",f:1},{c:"RSA2",n:"Ronwen Williams"},{c:"RSA3",n:"Sipho Chaine"},
+    {c:"RSA4",n:"Aubrey Modiba"},{c:"RSA5",n:"Samukele Kabini"},{c:"RSA6",n:"Mbekezeli Mbokazi"},
+    {c:"RSA7",n:"Khulumani Ndamane"},{c:"RSA8",n:"Siyabonga Ngezana"},{c:"RSA9",n:"Khuliso Mudau"},
+    {c:"RSA10",n:"Nkosinathi Sibisi"},{c:"RSA11",n:"Teboho Mokoena"},{c:"RSA12",n:"Thalente Mbatha"},
+    {c:"RSA13",n:"Foto Equipo"},{c:"RSA14",n:"Bathasi Aubaas"},{c:"RSA15",n:"Yaya Sithole"},
+    {c:"RSA16",n:"Sipho Mbule"},{c:"RSA17",n:"Lyle Foster"},{c:"RSA18",n:"Iqraam Rayners"},
+    {c:"RSA19",n:"Mohau Nkota"},{c:"RSA20",n:"Oswin Appollis"}]},
+  {id:"KOR",name:"Corea del Sur",flag:"🇰🇷",pg:12,st:[
+    {c:"KOR1",n:"Escudo",f:1},{c:"KOR2",n:"Hyeon-woo Jo"},{c:"KOR3",n:"Seung-Gyu Kim"},
+    {c:"KOR4",n:"Min-jae Kim"},{c:"KOR5",n:"Yu-min Cho"},{c:"KOR6",n:"Young-woo Seol"},
+    {c:"KOR7",n:"Han-beom Lee"},{c:"KOR8",n:"Tae-seok Lee"},{c:"KOR9",n:"Myung-jae Lee"},
+    {c:"KOR10",n:"Jae-sung Lee"},{c:"KOR11",n:"In-beom Hwang"},{c:"KOR12",n:"Kang-in Lee"},
+    {c:"KOR13",n:"Foto Equipo"},{c:"KOR14",n:"Seung-ho Paik"},{c:"KOR15",n:"Jens Castrop"},
+    {c:"KOR16",n:"Dong-yeong Lee"},{c:"KOR17",n:"Gue-sung Cho"},{c:"KOR18",n:"Heung-min Son"},
+    {c:"KOR19",n:"Hee-chan Hwang"},{c:"KOR20",n:"Hyeon-Gyu Oh"}]},
+  {id:"CZE",name:"Chequia",flag:"🇨🇿",pg:14,st:[
+    {c:"CZE1",n:"Escudo",f:1},{c:"CZE2",n:"Matej Kovar"},{c:"CZE3",n:"Jindrich Stanek"},
+    {c:"CZE4",n:"Ladislav Krejci"},{c:"CZE5",n:"Vladimir Coufal"},{c:"CZE6",n:"Jaroslav Zeleny"},
+    {c:"CZE7",n:"Tomas Holes"},{c:"CZE8",n:"David Zima"},{c:"CZE9",n:"Michal Sadilek"},
+    {c:"CZE10",n:"Lukas Provod"},{c:"CZE11",n:"Lukas Cerv"},{c:"CZE12",n:"Tomas Soucek"},
+    {c:"CZE13",n:"Foto Equipo"},{c:"CZE14",n:"Pavel Sulc"},{c:"CZE15",n:"Matej Vydra"},
+    {c:"CZE16",n:"Vasil Kusej"},{c:"CZE17",n:"Tomas Chory"},{c:"CZE18",n:"Vaclav Cerny"},
+    {c:"CZE19",n:"Adam Hlozek"},{c:"CZE20",n:"Patrik Schick"}]}
+]},
+// B: CAN BIH QAT SUI
+{g:"B",label:"Canadá · Bosnia-Herzegovina · Qatar · Suiza",teams:[
+  {id:"CAN",name:"Canadá",flag:"🇨🇦",pg:16,st:[
+    {c:"CAN1",n:"Escudo",f:1},{c:"CAN2",n:"Dayne St.Clair"},{c:"CAN3",n:"Alphonso Davies"},
+    {c:"CAN4",n:"Alistair Johnston"},{c:"CAN5",n:"Samuel Adekugbe"},{c:"CAN6",n:"Riche Larvea"},
+    {c:"CAN7",n:"Derek Cornelius"},{c:"CAN8",n:"Moïse Bombito"},{c:"CAN9",n:"Kamal Miller"},
+    {c:"CAN10",n:"Stephen Eustáquio"},{c:"CAN11",n:"Ismaël Koné"},{c:"CAN12",n:"Jonathan Osorio"},
+    {c:"CAN13",n:"Foto Equipo"},{c:"CAN14",n:"Jacob Shaffelburg"},{c:"CAN15",n:"Mathieu Choinière"},
+    {c:"CAN16",n:"Niko Sigur"},{c:"CAN17",n:"Tajon Buchanan"},{c:"CAN18",n:"Liam Millar"},
+    {c:"CAN19",n:"Cyle Larin"},{c:"CAN20",n:"Jonathan David"}]},
+  {id:"BIH",name:"Bosnia-Herzegovina",flag:"🇧🇦",pg:18,st:[
+    {c:"BIH1",n:"Escudo",f:1},{c:"BIH2",n:"Nikola Vasilj"},{c:"BIH3",n:"Amer Dedic"},
+    {c:"BIH4",n:"Sead Kolasinac"},{c:"BIH5",n:"Tarik Muharemovic"},{c:"BIH6",n:"Nihad Mujakic"},
+    {c:"BIH7",n:"Nikola Katic"},{c:"BIH8",n:"Amir Hadziahmetovic"},{c:"BIH9",n:"Benjamin Tahirovic"},
+    {c:"BIH10",n:"Armin Gigovic"},{c:"BIH11",n:"Ivan Sunjic"},{c:"BIH12",n:"Ivan Basic"},
+    {c:"BIH13",n:"Foto Equipo"},{c:"BIH14",n:"Dzenis Burnic"},{c:"BIH15",n:"Esmir Bajraktarevic"},
+    {c:"BIH16",n:"Amar Memic"},{c:"BIH17",n:"Ermedin Demirovic"},{c:"BIH18",n:"Edin Dzeko"},
+    {c:"BIH19",n:"Samed Bazdar"},{c:"BIH20",n:"Haris Tabakovic"}]},
+  {id:"QAT",name:"Qatar",flag:"🇶🇦",pg:20,st:[
+    {c:"QAT1",n:"Escudo",f:1},{c:"QAT2",n:"Meshaal Barsham"},{c:"QAT3",n:"Sultan Albrake"},
+    {c:"QAT4",n:"Lucas Mendes"},{c:"QAT5",n:"Homam Ahmed"},{c:"QAT6",n:"Boualem Khoukhi"},
+    {c:"QAT7",n:"Pedro Miguel"},{c:"QAT8",n:"Tarek Salman"},{c:"QAT9",n:"Mohamed Al-Mannai"},
+    {c:"QAT10",n:"Karim Boudiaf"},{c:"QAT11",n:"Assim Madibo"},{c:"QAT12",n:"Ahmed Fatehi"},
+    {c:"QAT13",n:"Foto Equipo"},{c:"QAT14",n:"Mohammed Waad"},{c:"QAT15",n:"Abdulaziz Hatem"},
+    {c:"QAT16",n:"Hassan Al-Haydos"},{c:"QAT17",n:"Edmilson Junior"},{c:"QAT18",n:"Akram Afif"},
+    {c:"QAT19",n:"Ahmed Al Ganehi"},{c:"QAT20",n:"Almoez Ali"}]},
+  {id:"SUI",name:"Suiza",flag:"🇨🇭",pg:22,st:[
+    {c:"SUI1",n:"Escudo",f:1},{c:"SUI2",n:"Gregor Kobel"},{c:"SUI3",n:"Yvon Mvogo"},
+    {c:"SUI4",n:"Manuel Akanji"},{c:"SUI5",n:"Ricardo Rodriguez"},{c:"SUI6",n:"Nico Elvedi"},
+    {c:"SUI7",n:"Aurèle Amenda"},{c:"SUI8",n:"Silvan Widmer"},{c:"SUI9",n:"Granit Xhaka"},
+    {c:"SUI10",n:"Denis Zakaria"},{c:"SUI11",n:"Remo Freuler"},{c:"SUI12",n:"Fabian Rieder"},
+    {c:"SUI13",n:"Foto Equipo"},{c:"SUI14",n:"Ardon Jashari"},{c:"SUI15",n:"Johan Manzambi"},
+    {c:"SUI16",n:"Michel Aebischer"},{c:"SUI17",n:"Breel Embolo"},{c:"SUI18",n:"Ruben Vargas"},
+    {c:"SUI19",n:"Dan Ndoye"},{c:"SUI20",n:"Zeki Amdouni"}]}
+]},
+// C: BRA MAR HAI SCO
+{g:"C",label:"Brasil · Marruecos · Haití · Escocia",teams:[
+  {id:"BRA",name:"Brasil",flag:"🇧🇷",pg:24,st:[
+    {c:"BRA1",n:"Escudo",f:1},{c:"BRA2",n:"Alisson"},{c:"BRA3",n:"Bento"},
+    {c:"BRA4",n:"Marquinhos"},{c:"BRA5",n:"Éder Militão"},{c:"BRA6",n:"Gabriel Magalhães"},
+    {c:"BRA7",n:"Danilo"},{c:"BRA8",n:"Wesley"},{c:"BRA9",n:"Lucas Paquetá"},
+    {c:"BRA10",n:"Casemiro"},{c:"BRA11",n:"Bruno Guimarães"},{c:"BRA12",n:"Luiz Henrique"},
+    {c:"BRA13",n:"Foto Equipo"},{c:"BRA14",n:"Vinicius Júnior"},{c:"BRA15",n:"Rodrygo"},
+    {c:"BRA16",n:"João Pedro"},{c:"BRA17",n:"Matheus Cunha"},{c:"BRA18",n:"Gabriel Martinelli"},
+    {c:"BRA19",n:"Raphinha"},{c:"BRA20",n:"Estévão"}]},
+  {id:"MAR",name:"Marruecos",flag:"🇲🇦",pg:26,st:[
+    {c:"MAR1",n:"Escudo",f:1},{c:"MAR2",n:"Yassine Bounou"},{c:"MAR3",n:"Munir El Kajoui"},
+    {c:"MAR4",n:"Achraf Hakimi"},{c:"MAR5",n:"Noussair Mazraoui"},{c:"MAR6",n:"Nayef Aguerd"},
+    {c:"MAR7",n:"Roman Saiss"},{c:"MAR8",n:"Jawad El Yamiq"},{c:"MAR9",n:"Adam Masina"},
+    {c:"MAR10",n:"Sofyan Amrabat"},{c:"MAR11",n:"Azzedine Ounahi"},{c:"MAR12",n:"Eliesse Ben Seghir"},
+    {c:"MAR13",n:"Foto Equipo"},{c:"MAR14",n:"Bilal El Khannouss"},{c:"MAR15",n:"Ismael Saibari"},
+    {c:"MAR16",n:"Youssef En-Nesyri"},{c:"MAR17",n:"Abde Ezzalzouli"},{c:"MAR18",n:"Soufiane Rahimi"},
+    {c:"MAR19",n:"Brahim Diaz"},{c:"MAR20",n:"Ayoub El Kaabi"}]},
+  {id:"HAI",name:"Haití",flag:"🇭🇹",pg:28,st:[
+    {c:"HAI1",n:"Escudo",f:1},{c:"HAI2",n:"Johny Placide"},{c:"HAI3",n:"Carlens Arcus"},
+    {c:"HAI4",n:"Martin Expérience"},{c:"HAI5",n:"Jean-Kevin Duverne"},{c:"HAI6",n:"Ricardo Adé"},
+    {c:"HAI7",n:"Duke Lacroix"},{c:"HAI8",n:"Garven Metusala"},{c:"HAI9",n:"Hannes Delcroix"},
+    {c:"HAI10",n:"Leverton Pierre"},{c:"HAI11",n:"Danley Jean Jacques"},{c:"HAI12",n:"J-R Bellegarde"},
+    {c:"HAI13",n:"Foto Equipo"},{c:"HAI14",n:"Christopher Attys"},{c:"HAI15",n:"Derrick Etienne Jr"},
+    {c:"HAI16",n:"Josue Casimir"},{c:"HAI17",n:"Ruben Providence"},{c:"HAI18",n:"Duckens Nazon"},
+    {c:"HAI19",n:"Louicius Deedson"},{c:"HAI20",n:"Frantzdy Pierrot"}]},
+  {id:"SCO",name:"Escocia",flag:"🏴󠁧󠁢󠁳󠁣󠁴󠁿",pg:30,st:[
+    {c:"SCO1",n:"Escudo",f:1},{c:"SCO2",n:"Angus Gunn"},{c:"SCO3",n:"Jack Hendry"},
+    {c:"SCO4",n:"Kieran Tierney"},{c:"SCO5",n:"Aaron Hickey"},{c:"SCO6",n:"Andrew Robertson"},
+    {c:"SCO7",n:"Scott McKenna"},{c:"SCO8",n:"John Souttar"},{c:"SCO9",n:"Anthony Ralston"},
+    {c:"SCO10",n:"Grant Hanley"},{c:"SCO11",n:"Scott McTominay"},{c:"SCO12",n:"Billy Gilmour"},
+    {c:"SCO13",n:"Foto Equipo"},{c:"SCO14",n:"Lewis Ferguson"},{c:"SCO15",n:"Ryan Christie"},
+    {c:"SCO16",n:"Kenny McLean"},{c:"SCO17",n:"John McGinn"},{c:"SCO18",n:"Lyndon Dykes"},
+    {c:"SCO19",n:"Che Adams"},{c:"SCO20",n:"Ben Doak"}]}
+]},
+// D: USA PAR AUS TUR  ← Türkiye (no Congo DR)
+{g:"D",label:"USA · Paraguay · Australia · Türkiye",teams:[
+  {id:"USA",name:"Estados Unidos",flag:"🇺🇸",pg:32,st:[
+    {c:"USA1",n:"Escudo",f:1},{c:"USA2",n:"Matt Freese"},{c:"USA3",n:"Chris Richards"},
+    {c:"USA4",n:"Tim Ream"},{c:"USA5",n:"Mark McKenzie"},{c:"USA6",n:"Alex Freeman"},
+    {c:"USA7",n:"Antonee Robinson"},{c:"USA8",n:"Tyler Adams"},{c:"USA9",n:"Tanner Tessmann"},
+    {c:"USA10",n:"Weston McKennie"},{c:"USA11",n:"Christian Roldan"},{c:"USA12",n:"Timothy Weah"},
+    {c:"USA13",n:"Foto Equipo"},{c:"USA14",n:"Diego Luna"},{c:"USA15",n:"Malik Tillman"},
+    {c:"USA16",n:"Christian Pulisic"},{c:"USA17",n:"Brenden Aaronson"},{c:"USA18",n:"Ricardo Pepi"},
+    {c:"USA19",n:"Haji Wright"},{c:"USA20",n:"Folarin Balogun"}]},
+  {id:"PAR",name:"Paraguay",flag:"🇵🇾",pg:34,st:[
+    {c:"PAR1",n:"Escudo",f:1},{c:"PAR2",n:"Roberto Fernandez"},{c:"PAR3",n:"Orlando Gill"},
+    {c:"PAR4",n:"Gustavo Gomez"},{c:"PAR5",n:"Fabián Balbuena"},{c:"PAR6",n:"Juan José Cáceres"},
+    {c:"PAR7",n:"Omar Alderete"},{c:"PAR8",n:"Junior Alonso"},{c:"PAR9",n:"Mathías Villasanti"},
+    {c:"PAR10",n:"Diego Gomez"},{c:"PAR11",n:"Damián Bobadilla"},{c:"PAR12",n:"Andres Cubas"},
+    {c:"PAR13",n:"Foto Equipo"},{c:"PAR14",n:"Matias Galarza"},{c:"PAR15",n:"Julio Enciso"},
+    {c:"PAR16",n:"Alejandro Romero"},{c:"PAR17",n:"Miguel Almirón"},{c:"PAR18",n:"Ramon Sosa"},
+    {c:"PAR19",n:"Angel Romero"},{c:"PAR20",n:"Antonio Sanabria"}]},
+  {id:"AUS",name:"Australia",flag:"🇦🇺",pg:36,st:[
+    {c:"AUS1",n:"Escudo",f:1},{c:"AUS2",n:"Mathew Ryan"},{c:"AUS3",n:"Joe Gauci"},
+    {c:"AUS4",n:"Harry Souttar"},{c:"AUS5",n:"Alessandro Circati"},{c:"AUS6",n:"Jordan Bos"},
+    {c:"AUS7",n:"Aziz Behich"},{c:"AUS8",n:"Cameron Burgess"},{c:"AUS9",n:"Lewis Miller"},
+    {c:"AUS10",n:"Milos Degenek"},{c:"AUS11",n:"Jackson Irvine"},{c:"AUS12",n:"Riley McGree"},
+    {c:"AUS13",n:"Foto Equipo"},{c:"AUS14",n:"Aiden O'Neill"},{c:"AUS15",n:"Connor Metcalfe"},
+    {c:"AUS16",n:"Patrick Yazbek"},{c:"AUS17",n:"Craig Goodwin"},{c:"AUS18",n:"Kusini Venter"},
+    {c:"AUS19",n:"Nestory Irankunda"},{c:"AUS20",n:"Mohamed Touré"}]},
+  {id:"TUR",name:"Türkiye",flag:"🇹🇷",pg:38,st:[
+    {c:"TUR1",n:"Escudo",f:1},{c:"TUR2",n:"Ugurcan Cakir"},{c:"TUR3",n:"Altay Bayindir"},
+    {c:"TUR4",n:"Merih Demiral"},{c:"TUR5",n:"Samet Akaydin"},{c:"TUR6",n:"Abdulkerim Bardakci"},
+    {c:"TUR7",n:"Zeki Celik"},{c:"TUR8",n:"Mert Muldur"},{c:"TUR9",n:"Orkun Kokcu"},
+    {c:"TUR10",n:"Hakan Calhanoglu"},{c:"TUR11",n:"Salih Ozcan"},{c:"TUR12",n:"Okay Yokuslu"},
+    {c:"TUR13",n:"Foto Equipo"},{c:"TUR14",n:"Arda Guler"},{c:"TUR15",n:"Kerem Akturkoglu"},
+    {c:"TUR16",n:"Baris Alper Yilmaz"},{c:"TUR17",n:"Yusuf Yazici"},{c:"TUR18",n:"Semih Kilicsoy"},
+    {c:"TUR19",n:"Cenk Tosun"},{c:"TUR20",n:"Serdar Dursun"}]}
+]},
+// E: GER CUW CIV ECU
+{g:"E",label:"Alemania · Curazao · Costa de Marfil · Ecuador",teams:[
+  {id:"GER",name:"Alemania",flag:"🇩🇪",pg:40,st:[
+    {c:"GER1",n:"Escudo",f:1},{c:"GER2",n:"Manuel Neuer"},{c:"GER3",n:"Marc ter Stegen"},
+    {c:"GER4",n:"Antonio Rüdiger"},{c:"GER5",n:"Jonathan Tah"},{c:"GER6",n:"Nico Schlotterbeck"},
+    {c:"GER7",n:"Joshua Kimmich"},{c:"GER8",n:"David Raum"},{c:"GER9",n:"Ilkay Gündogan"},
+    {c:"GER10",n:"Florian Wirtz"},{c:"GER11",n:"Jamal Musiala"},{c:"GER12",n:"Leroy Sané"},
+    {c:"GER13",n:"Foto Equipo"},{c:"GER14",n:"Kai Havertz"},{c:"GER15",n:"Thomas Müller"},
+    {c:"GER16",n:"Serge Gnabry"},{c:"GER17",n:"Niclas Füllkrug"},{c:"GER18",n:"Chris Führich"},
+    {c:"GER19",n:"Deniz Undav"},{c:"GER20",n:"Tim Kleindienst"}]},
+  {id:"CUW",name:"Curazao",flag:"🇨🇼",pg:42,st:[
+    {c:"CUW1",n:"Escudo",f:1},{c:"CUW2",n:"Eloy Room"},{c:"CUW3",n:"Gilmar Lips"},
+    {c:"CUW4",n:"Ethan Doest"},{c:"CUW5",n:"Juriaan van der Meer"},{c:"CUW6",n:"Cuco Martina"},
+    {c:"CUW7",n:"Jairzinho Pieter"},{c:"CUW8",n:"Gershon Klomp"},{c:"CUW9",n:"Leandro Bacuna"},
+    {c:"CUW10",n:"Damil Dankerlui"},{c:"CUW11",n:"Terrence Boyd"},{c:"CUW12",n:"Brandley Kuwas"},
+    {c:"CUW13",n:"Foto Equipo"},{c:"CUW14",n:"Jamiro Monteiro"},{c:"CUW15",n:"C. Tronçoso"},
+    {c:"CUW16",n:"Elson Hooi"},{c:"CUW17",n:"Gevaro Nepomuceno"},{c:"CUW18",n:"R. Bazoer"},
+    {c:"CUW19",n:"Ryan Donk"},{c:"CUW20",n:"Myron Boadu"}]},
+  {id:"CIV",name:"Costa de Marfil",flag:"🇨🇮",pg:44,st:[
+    {c:"CIV1",n:"Escudo",f:1},{c:"CIV2",n:"Yahia Fofana"},{c:"CIV3",n:"Ghislain Konan"},
+    {c:"CIV4",n:"Wilfried Singo"},{c:"CIV5",n:"Odilon Kossounou"},{c:"CIV6",n:"Evan Ndicka"},
+    {c:"CIV7",n:"Willy Boly"},{c:"CIV8",n:"Emmanuel Agbadou"},{c:"CIV9",n:"Ousmane Diomande"},
+    {c:"CIV10",n:"Franck Kessié"},{c:"CIV11",n:"Seko Fofana"},{c:"CIV12",n:"Ibrahim Sangaré"},
+    {c:"CIV13",n:"Foto Equipo"},{c:"CIV14",n:"J-P Gbamin"},{c:"CIV15",n:"Amad Diallo"},
+    {c:"CIV16",n:"Sébastien Haller"},{c:"CIV17",n:"Simon Adingra"},{c:"CIV18",n:"Yan Diomande"},
+    {c:"CIV19",n:"Evann Guessand"},{c:"CIV20",n:"Oumar Diakite"}]},
+  {id:"ECU",name:"Ecuador",flag:"🇪🇨",pg:46,st:[
+    {c:"ECU1",n:"Escudo",f:1},{c:"ECU2",n:"Hernán Galíndez"},{c:"ECU3",n:"Alexander Domínguez"},
+    {c:"ECU4",n:"Robert Arboleda"},{c:"ECU5",n:"Piero Hincapié"},{c:"ECU6",n:"Félix Torres"},
+    {c:"ECU7",n:"Ángelo Preciado"},{c:"ECU8",n:"Pervis Estupiñán"},{c:"ECU9",n:"Carlos Gruezo"},
+    {c:"ECU10",n:"Moisés Caicedo"},{c:"ECU11",n:"Jhegson Méndez"},{c:"ECU12",n:"Jeremy Sarmiento"},
+    {c:"ECU13",n:"Foto Equipo"},{c:"ECU14",n:"Enner Valencia"},{c:"ECU15",n:"Gonzalo Plata"},
+    {c:"ECU16",n:"Ángel Mena"},{c:"ECU17",n:"Michael Estrada"},{c:"ECU18",n:"Djorkaeff Reasco"},
+    {c:"ECU19",n:"Kevin Rodríguez"},{c:"ECU20",n:"Jordy Caicedo"}]}
+]},
+// F: NED JPN SWE TUN
+{g:"F",label:"Países Bajos · Japón · Suecia · Túnez",teams:[
+  {id:"NED",name:"Países Bajos",flag:"🇳🇱",pg:48,st:[
+    {c:"NED1",n:"Escudo",f:1},{c:"NED2",n:"Bart Verbruggen"},{c:"NED3",n:"Mark Flekken"},
+    {c:"NED4",n:"Virgil van Dijk"},{c:"NED5",n:"Stefan de Vrij"},{c:"NED6",n:"Matthijs de Ligt"},
+    {c:"NED7",n:"Denzel Dumfries"},{c:"NED8",n:"Daley Blind"},{c:"NED9",n:"Frenkie de Jong"},
+    {c:"NED10",n:"Teun Koopmeiners"},{c:"NED11",n:"Tijjani Reijnders"},{c:"NED12",n:"Ryan Gravenberch"},
+    {c:"NED13",n:"Foto Equipo"},{c:"NED14",n:"Cody Gakpo"},{c:"NED15",n:"Memphis Depay"},
+    {c:"NED16",n:"Donyell Malen"},{c:"NED17",n:"Wout Weghorst"},{c:"NED18",n:"Brian Brobbey"},
+    {c:"NED19",n:"Xavi Simons"},{c:"NED20",n:"Noa Lang"}]},
+  {id:"JPN",name:"Japón",flag:"🇯🇵",pg:50,st:[
+    {c:"JPN1",n:"Escudo",f:1},{c:"JPN2",n:"Shuichi Gonda"},{c:"JPN3",n:"Zion Suzuki"},
+    {c:"JPN4",n:"Maya Yoshida"},{c:"JPN5",n:"Ko Itakura"},{c:"JPN6",n:"Shogo Taniguchi"},
+    {c:"JPN7",n:"Hiroki Sakai"},{c:"JPN8",n:"Yuto Nagatomo"},{c:"JPN9",n:"Wataru Endo"},
+    {c:"JPN10",n:"Hidemasa Morita"},{c:"JPN11",n:"Kaoru Mitoma"},{c:"JPN12",n:"Junya Ito"},
+    {c:"JPN13",n:"Foto Equipo"},{c:"JPN14",n:"Takuma Asano"},{c:"JPN15",n:"Daichi Kamada"},
+    {c:"JPN16",n:"Ritsu Doan"},{c:"JPN17",n:"Ao Tanaka"},{c:"JPN18",n:"Takefusa Kubo"},
+    {c:"JPN19",n:"Ayase Ueda"},{c:"JPN20",n:"Koki Machida"}]},
+  {id:"SWE",name:"Suecia",flag:"🇸🇪",pg:52,st:[
+    {c:"SWE1",n:"Escudo",f:1},{c:"SWE2",n:"Robin Olsen"},{c:"SWE3",n:"Samuel Brolin"},
+    {c:"SWE4",n:"Victor Lindelöf"},{c:"SWE5",n:"Carl Starfelt"},{c:"SWE6",n:"Marcus Danielson"},
+    {c:"SWE7",n:"Emil Krafth"},{c:"SWE8",n:"Ludwig Augustinsson"},{c:"SWE9",n:"Albin Ekdal"},
+    {c:"SWE10",n:"Viktor Claesson"},{c:"SWE11",n:"Kristoffer Olsson"},{c:"SWE12",n:"Sebastian Larsson"},
+    {c:"SWE13",n:"Foto Equipo"},{c:"SWE14",n:"Isak Hien"},{c:"SWE15",n:"Emil Forsberg"},
+    {c:"SWE16",n:"Alexander Isak"},{c:"SWE17",n:"Dejan Kulusevski"},{c:"SWE18",n:"Robin Quaison"},
+    {c:"SWE19",n:"Jordan Larsson"},{c:"SWE20",n:"Marcus Thulberg"}]},
+  {id:"TUN",name:"Túnez",flag:"🇹🇳",pg:54,st:[
+    {c:"TUN1",n:"Escudo",f:1},{c:"TUN2",n:"Aymen Dahmen"},{c:"TUN3",n:"Bechir Ben Said"},
+    {c:"TUN4",n:"Yassine Meriah"},{c:"TUN5",n:"Dylan Bronn"},{c:"TUN6",n:"Montassar Talbi"},
+    {c:"TUN7",n:"Mohamed Drager"},{c:"TUN8",n:"Ali Maaloul"},{c:"TUN9",n:"Ellyes Skhiri"},
+    {c:"TUN10",n:"Aissa Laidouni"},{c:"TUN11",n:"Hannibal Mejbri"},{c:"TUN12",n:"Ghaylen Chaalali"},
+    {c:"TUN13",n:"Foto Equipo"},{c:"TUN14",n:"Nizar Issaoui"},{c:"TUN15",n:"Sayfallah Ltaief"},
+    {c:"TUN16",n:"Naim Sliti"},{c:"TUN17",n:"Wahbi Khazri"},{c:"TUN18",n:"Youssef Msakni"},
+    {c:"TUN19",n:"Issam Jebali"},{c:"TUN20",n:"Seifeddine Jaziri"}]}
+]},
+// G: BEL EGY IRN NZL
+{g:"G",label:"Bélgica · Egipto · IR Irán · Nueva Zelanda",teams:[
+  {id:"BEL",name:"Bélgica",flag:"🇧🇪",pg:58,st:[
+    {c:"BEL1",n:"Escudo",f:1},{c:"BEL2",n:"Thibaut Courtois"},{c:"BEL3",n:"Arthur Theate"},
+    {c:"BEL4",n:"Timothy Castagne"},{c:"BEL5",n:"Zeno Debast"},{c:"BEL6",n:"Brandon Mechele"},
+    {c:"BEL7",n:"Maxim De Cuyper"},{c:"BEL8",n:"Thomas Meunier"},{c:"BEL9",n:"Youri Tielemans"},
+    {c:"BEL10",n:"Amadou Onana"},{c:"BEL11",n:"Nicolas Raskin"},{c:"BEL12",n:"Alexis Saelemaekers"},
+    {c:"BEL13",n:"Foto Equipo"},{c:"BEL14",n:"Hans Vanaken"},{c:"BEL15",n:"Kevin De Bruyne"},
+    {c:"BEL16",n:"Jérémy Doku"},{c:"BEL17",n:"Charles De Ketelaere"},{c:"BEL18",n:"Leandro Trossard"},
+    {c:"BEL19",n:"Loïs Openda"},{c:"BEL20",n:"Romelu Lukaku"}]},
+  {id:"EGY",name:"Egipto",flag:"🇪🇬",pg:60,st:[
+    {c:"EGY1",n:"Escudo",f:1},{c:"EGY2",n:"Mohamed El-Shenawy"},{c:"EGY3",n:"Ahmed El-Shenawy"},
+    {c:"EGY4",n:"Ahmed Hegazy"},{c:"EGY5",n:"Omar Gaber"},{c:"EGY6",n:"Badr Benoun"},
+    {c:"EGY7",n:"Akram Tawfik"},{c:"EGY8",n:"Trézéguet"},{c:"EGY9",n:"Tarek Hamed"},
+    {c:"EGY10",n:"Hamdi Fathi"},{c:"EGY11",n:"Amr El Sulaya"},{c:"EGY12",n:"Mohamed Elneny"},
+    {c:"EGY13",n:"Foto Equipo"},{c:"EGY14",n:"Mohamed Salah"},{c:"EGY15",n:"Mahmoud Hassan"},
+    {c:"EGY16",n:"Mostafa Mohamed"},{c:"EGY17",n:"Ramadan Sobhi"},{c:"EGY18",n:"Omar Marmoush"},
+    {c:"EGY19",n:"Zizo"},{c:"EGY20",n:"Emam Ashour"}]},
+  {id:"IRN",name:"IR Irán",flag:"🇮🇷",pg:62,st:[
+    {c:"IRN1",n:"Escudo",f:1},{c:"IRN2",n:"Alireza Beiranvand"},{c:"IRN3",n:"Hossein Hosseini"},
+    {c:"IRN4",n:"Majid Hosseini"},{c:"IRN5",n:"Morteza Pouraliganji"},{c:"IRN6",n:"Shoja Khalilzadeh"},
+    {c:"IRN7",n:"Ramin Rezaeian"},{c:"IRN8",n:"Ehsan Hajsafi"},{c:"IRN9",n:"Ahmad Noorollahi"},
+    {c:"IRN10",n:"Ali Gholizadeh"},{c:"IRN11",n:"Saeid Ezatolahi"},{c:"IRN12",n:"Saman Ghoddos"},
+    {c:"IRN13",n:"Foto Equipo"},{c:"IRN14",n:"Mehdi Taremi"},{c:"IRN15",n:"Sardar Azmoun"},
+    {c:"IRN16",n:"Karim Ansarifard"},{c:"IRN17",n:"Alireza Jahanbakhsh"},{c:"IRN18",n:"Vahid Amiri"},
+    {c:"IRN19",n:"Omid Ebrahimi"},{c:"IRN20",n:"Amir Ghalenoei Jr"}]},
+  {id:"NZL",name:"Nueva Zelanda",flag:"🇳🇿",pg:64,st:[
+    {c:"NZL1",n:"Escudo",f:1},{c:"NZL2",n:"Stefan Marinovic"},{c:"NZL3",n:"Max Crocombe"},
+    {c:"NZL4",n:"Winston Reid"},{c:"NZL5",n:"Tommy Smith"},{c:"NZL6",n:"Nando Pijnaker"},
+    {c:"NZL7",n:"Liberato Cacace"},{c:"NZL8",n:"Matthew Garbett"},{c:"NZL9",n:"Ryan Thomas"},
+    {c:"NZL10",n:"Clayton Lewis"},{c:"NZL11",n:"Elijah Just"},{c:"NZL12",n:"Alex Greive"},
+    {c:"NZL13",n:"Foto Equipo"},{c:"NZL14",n:"Sarpreet Singh"},{c:"NZL15",n:"Joe Bell"},
+    {c:"NZL16",n:"Callan Elliot"},{c:"NZL17",n:"Myer Bevan"},{c:"NZL18",n:"Chris Wood"},
+    {c:"NZL19",n:"Hamish Watson"},{c:"NZL20",n:"Ben Old"}]}
+]},
+// H: ESP CPV KSA URU
+{g:"H",label:"España · Cabo Verde · Arabia Saudita · Uruguay",teams:[
+  {id:"ESP",name:"España",flag:"🇪🇸",pg:66,st:[
+    {c:"ESP1",n:"Escudo",f:1},{c:"ESP2",n:"Unai Simón"},{c:"ESP3",n:"David Raya"},
+    {c:"ESP4",n:"Aymeric Laporte"},{c:"ESP5",n:"Robin Le Normand"},{c:"ESP6",n:"Pau Cubarsí"},
+    {c:"ESP7",n:"Dani Carvajal"},{c:"ESP8",n:"Alejandro Grimaldo"},{c:"ESP9",n:"Rodri"},
+    {c:"ESP10",n:"Pedri"},{c:"ESP11",n:"Fabián Ruiz"},{c:"ESP12",n:"Dani Olmo"},
+    {c:"ESP13",n:"Foto Equipo"},{c:"ESP14",n:"Lamine Yamal"},{c:"ESP15",n:"Nico Williams"},
+    {c:"ESP16",n:"Ferran Torres"},{c:"ESP17",n:"Mikel Oyarzabal"},{c:"ESP18",n:"Álvaro Morata"},
+    {c:"ESP19",n:"Joselu"},{c:"ESP20",n:"Bryan Zaragoza"}]},
+  {id:"CPV",name:"Cabo Verde",flag:"🇨🇻",pg:68,st:[
+    {c:"CPV1",n:"Escudo",f:1},{c:"CPV2",n:"Vozinha"},{c:"CPV3",n:"Logan Costa"},
+    {c:"CPV4",n:"Pico"},{c:"CPV5",n:"Diney"},{c:"CPV6",n:"Steven Moreira"},
+    {c:"CPV7",n:"Wagner Pina"},{c:"CPV8",n:"Joao Paulo"},{c:"CPV9",n:"Yannick Semedo"},
+    {c:"CPV10",n:"Kevin Pina"},{c:"CPV11",n:"Patrick Andrade"},{c:"CPV12",n:"Jamiro Monteiro"},
+    {c:"CPV13",n:"Foto Equipo"},{c:"CPV14",n:"Deroy Duarte"},{c:"CPV15",n:"Garry Rodrigues"},
+    {c:"CPV16",n:"Jovane Cabral"},{c:"CPV17",n:"Ryan Mendes"},{c:"CPV18",n:"Dailon Livramento"},
+    {c:"CPV19",n:"Willie Semedo"},{c:"CPV20",n:"Djaniny"}]},
+  {id:"KSA",name:"Arabia Saudita",flag:"🇸🇦",pg:70,st:[
+    {c:"KSA1",n:"Escudo",f:1},{c:"KSA2",n:"Mohammed Al-Owais"},{c:"KSA3",n:"Nawaf Al-Aqidi"},
+    {c:"KSA4",n:"Ali Al-Bulayhi"},{c:"KSA5",n:"Hassan Tambakti"},{c:"KSA6",n:"Abdulelah Al-Amri"},
+    {c:"KSA7",n:"Saud Abdulhamid"},{c:"KSA8",n:"Yasser Al-Shahrani"},{c:"KSA9",n:"Mohammed Kanno"},
+    {c:"KSA10",n:"Nasser Aldawsari"},{c:"KSA11",n:"Salem Al-Dawsari"},{c:"KSA12",n:"Sami Al-Najei"},
+    {c:"KSA13",n:"Foto Equipo"},{c:"KSA14",n:"Haitham Asiri"},{c:"KSA15",n:"Firas Al-Buraikan"},
+    {c:"KSA16",n:"Saleh Al-Shehri"},{c:"KSA17",n:"Abdullah Radif"},{c:"KSA18",n:"Ahmed Sharahili"},
+    {c:"KSA19",n:"Mohammed Al-Buraik"},{c:"KSA20",n:"Riyadh Sharahili"}]},
+  {id:"URU",name:"Uruguay",flag:"🇺🇾",pg:72,st:[
+    {c:"URU1",n:"Escudo",f:1},{c:"URU2",n:"Sergio Rochet"},{c:"URU3",n:"Sebastián Sosa"},
+    {c:"URU4",n:"José María Giménez"},{c:"URU5",n:"Ronald Araújo"},{c:"URU6",n:"Mathías Olivera"},
+    {c:"URU7",n:"Guillermo Varela"},{c:"URU8",n:"Nahitan Nández"},{c:"URU9",n:"Federico Valverde"},
+    {c:"URU10",n:"Giorgian De Arrascaeta"},{c:"URU11",n:"Rodrigo Bentancur"},{c:"URU12",n:"Manuel Ugarte"},
+    {c:"URU13",n:"Foto Equipo"},{c:"URU14",n:"Nicolás de la Cruz"},{c:"URU15",n:"Maxi Araujo"},
+    {c:"URU16",n:"Darwin Núñez"},{c:"URU17",n:"Federico Viñas"},{c:"URU18",n:"Rodrigo Aguirre"},
+    {c:"URU19",n:"Facundo Pellistri"},{c:"URU20",n:"Darwin Machís"}]}
+]},
+// I: FRA SEN IRQ NOR  ← Iraq (no play-off)
+{g:"I",label:"Francia · Senegal · Iraq · Noruega",teams:[
+  {id:"FRA",name:"Francia",flag:"🇫🇷",pg:74,st:[
+    {c:"FRA1",n:"Escudo",f:1},{c:"FRA2",n:"Mike Maignan"},{c:"FRA3",n:"Brice Samba"},
+    {c:"FRA4",n:"Ibrahima Konaté"},{c:"FRA5",n:"Dayot Upamecano"},{c:"FRA6",n:"William Saliba"},
+    {c:"FRA7",n:"Jules Koundé"},{c:"FRA8",n:"Theo Hernández"},{c:"FRA9",n:"Eduardo Camavinga"},
+    {c:"FRA10",n:"Aurélien Tchouaméni"},{c:"FRA11",n:"Warren Zaïre-Emery"},{c:"FRA12",n:"Khéphren Thuram"},
+    {c:"FRA13",n:"Foto Equipo"},{c:"FRA14",n:"Kylian Mbappé"},{c:"FRA15",n:"Antoine Griezmann"},
+    {c:"FRA16",n:"Ousmane Dembélé"},{c:"FRA17",n:"Bradley Barcola"},{c:"FRA18",n:"Michael Olise"},
+    {c:"FRA19",n:"Randal Kolo Muani"},{c:"FRA20",n:"Marcus Thuram"}]},
+  {id:"SEN",name:"Senegal",flag:"🇸🇳",pg:76,st:[
+    {c:"SEN1",n:"Escudo",f:1},{c:"SEN2",n:"Edouard Mendy"},{c:"SEN3",n:"Alfred Gomis"},
+    {c:"SEN4",n:"Kalidou Koulibaly"},{c:"SEN5",n:"Abdou Diallo"},{c:"SEN6",n:"Pape Abou Cissé"},
+    {c:"SEN7",n:"Youssouf Sabaly"},{c:"SEN8",n:"Ismail Jakobs"},{c:"SEN9",n:"Nampalys Mendy"},
+    {c:"SEN10",n:"Idrissa Gueye"},{c:"SEN11",n:"Pape Matar Sarr"},{c:"SEN12",n:"Pathé Ciss"},
+    {c:"SEN13",n:"Foto Equipo"},{c:"SEN14",n:"Sadio Mané"},{c:"SEN15",n:"Ismaila Sarr"},
+    {c:"SEN16",n:"Nicolas Jackson"},{c:"SEN17",n:"Boulaye Dia"},{c:"SEN18",n:"Krepin Diatta"},
+    {c:"SEN19",n:"Habib Diallo"},{c:"SEN20",n:"Iliman Ndiaye"}]},
+  {id:"IRQ",name:"Iraq",flag:"🇮🇶",pg:78,st:[
+    {c:"IRQ1",n:"Escudo",f:1},{c:"IRQ2",n:"Jalal Hassan"},{c:"IRQ3",n:"Dhurgham Ismail"},
+    {c:"IRQ4",n:"Ali Adnan"},{c:"IRQ5",n:"Mustafa Nadhim"},{c:"IRQ6",n:"Mohammed Qasim"},
+    {c:"IRQ7",n:"Hussein Ali"},{c:"IRQ8",n:"Rebin Sulaka"},{c:"IRQ9",n:"Safaa Hadi"},
+    {c:"IRQ10",n:"Amjed Attwan"},{c:"IRQ11",n:"Bashar Resan"},{c:"IRQ12",n:"Ibrahim Bayesh"},
+    {c:"IRQ13",n:"Foto Equipo"},{c:"IRQ14",n:"Aymen Hussein"},{c:"IRQ15",n:"Osama Rashid"},
+    {c:"IRQ16",n:"Mohanad Ali"},{c:"IRQ17",n:"Ahmed Sami"},{c:"IRQ18",n:"Alaa Abbas"},
+    {c:"IRQ19",n:"Dana Hayder"},{c:"IRQ20",n:"Karrar Mohammed"}]},
+  {id:"NOR",name:"Noruega",flag:"🇳🇴",pg:80,st:[
+    {c:"NOR1",n:"Escudo",f:1},{c:"NOR2",n:"Ørjan Nyland"},{c:"NOR3",n:"Rune Jarstein"},
+    {c:"NOR4",n:"Leo Østigård"},{c:"NOR5",n:"Andreas Hanche-Olsen"},{c:"NOR6",n:"Kristoffer Ajer"},
+    {c:"NOR7",n:"Birger Meling"},{c:"NOR8",n:"Stian Gregersen"},{c:"NOR9",n:"Sander Berge"},
+    {c:"NOR10",n:"Martin Ødegaard"},{c:"NOR11",n:"Mathias Normann"},{c:"NOR12",n:"Fredrik Aursnes"},
+    {c:"NOR13",n:"Foto Equipo"},{c:"NOR14",n:"Erling Haaland"},{c:"NOR15",n:"Alexander Sørloth"},
+    {c:"NOR16",n:"M. Elyounoussi"},{c:"NOR17",n:"Ola Solbakken"},{c:"NOR18",n:"J.P. Hauge"},
+    {c:"NOR19",n:"Kristian Thorstvedt"},{c:"NOR20",n:"Thelo Aasgaard"}]}
+]},
+// J: ARG ALG AUT JOR
+{g:"J",label:"Argentina · Argelia · Austria · Jordania",teams:[
+  {id:"ARG",name:"Argentina",flag:"🇦🇷",pg:82,st:[
+    {c:"ARG1",n:"Escudo",f:1},{c:"ARG2",n:"Emiliano Martínez"},{c:"ARG3",n:"Nahuel Molina"},
+    {c:"ARG4",n:"Cristian Romero"},{c:"ARG5",n:"Nicolás Otamendi"},{c:"ARG6",n:"Nicolás Tagliafico"},
+    {c:"ARG7",n:"Leonardo Balerdi"},{c:"ARG8",n:"Enzo Fernández"},{c:"ARG9",n:"Alexis Mac Allister"},
+    {c:"ARG10",n:"Rodrigo De Paul"},{c:"ARG11",n:"Exequiel Palacios"},{c:"ARG12",n:"Leandro Paredes"},
+    {c:"ARG13",n:"Foto Equipo"},{c:"ARG14",n:"Nico Paz"},{c:"ARG15",n:"Franco Mastantuono"},
+    {c:"ARG16",n:"Nico González"},{c:"ARG17",n:"Lionel Messi"},{c:"ARG18",n:"Lautaro Martínez"},
+    {c:"ARG19",n:"Julián Álvarez"},{c:"ARG20",n:"Giuliano Simeone"}]},
+  {id:"ALG",name:"Argelia",flag:"🇩🇿",pg:84,st:[
+    {c:"ALG1",n:"Escudo",f:1},{c:"ALG2",n:"Alexis Guendouz"},{c:"ALG3",n:"Ramy Bensebaini"},
+    {c:"ALG4",n:"Youcef Atal"},{c:"ALG5",n:"Rayan Aït-Nouri"},{c:"ALG6",n:"M. A. Tougai"},
+    {c:"ALG7",n:"Aïssa Mandi"},{c:"ALG8",n:"Ismael Bennacer"},{c:"ALG9",n:"Houssem Aquar"},
+    {c:"ALG10",n:"Hicham Boudaoui"},{c:"ALG11",n:"Ramiz Zerrouki"},{c:"ALG12",n:"Nabil Bentalab"},
+    {c:"ALG13",n:"Foto Equipo"},{c:"ALG14",n:"Farés Chaibi"},{c:"ALG15",n:"Riyad Mahrez"},
+    {c:"ALG16",n:"Said Benrahma"},{c:"ALG17",n:"Anis Hadj Moussa"},{c:"ALG18",n:"Amine Gouiri"},
+    {c:"ALG19",n:"Baghdad Bounedjah"},{c:"ALG20",n:"Mohammed Amoura"}]},
+  {id:"AUT",name:"Austria",flag:"🇦🇹",pg:86,st:[
+    {c:"AUT1",n:"Escudo",f:1},{c:"AUT2",n:"Alexander Schlager"},{c:"AUT3",n:"Patrick Pentz"},
+    {c:"AUT4",n:"David Alaba"},{c:"AUT5",n:"Kevin Danso"},{c:"AUT6",n:"Philipp Lienhart"},
+    {c:"AUT7",n:"Stefan Bosch"},{c:"AUT8",n:"Phillipp Mwene"},{c:"AUT9",n:"Alexander Prass"},
+    {c:"AUT10",n:"Xavier Schlager"},{c:"AUT11",n:"Marcel Sabitzer"},{c:"AUT12",n:"Konrad Laimer"},
+    {c:"AUT13",n:"Foto Equipo"},{c:"AUT14",n:"Florian Grillitsch"},{c:"AUT15",n:"Nicolas Seiwald"},
+    {c:"AUT16",n:"Romano Schmid"},{c:"AUT17",n:"Patrick Wimmer"},{c:"AUT18",n:"C. Baumgartner"},
+    {c:"AUT19",n:"M. Gregoritsch"},{c:"AUT20",n:"Marko Arnautović"}]},
+  {id:"JOR",name:"Jordania",flag:"🇯🇴",pg:88,st:[
+    {c:"JOR1",n:"Escudo",f:1},{c:"JOR2",n:"Yazeed Abo Laila"},{c:"JOR3",n:"Mohammad Shbair"},
+    {c:"JOR4",n:"Osama Rawabdeh"},{c:"JOR5",n:"Baha Abdulrahman"},{c:"JOR6",n:"Ahmad Salam"},
+    {c:"JOR7",n:"Yazan Al-Naimat"},{c:"JOR8",n:"Mohammad Al-Rosan"},{c:"JOR9",n:"Musa Suleiman"},
+    {c:"JOR10",n:"Monther Abu Amara"},{c:"JOR11",n:"Noor Al-Rawabdeh"},{c:"JOR12",n:"Ayman Dababneh"},
+    {c:"JOR13",n:"Foto Equipo"},{c:"JOR14",n:"Ahmad Haroun"},{c:"JOR15",n:"M. Bani Attiyah"},
+    {c:"JOR16",n:"Moussa Al-Tamari"},{c:"JOR17",n:"Yazan Al-Arab"},{c:"JOR18",n:"Ahmad Al-Ali"},
+    {c:"JOR19",n:"Zaid Al-Amleh"},{c:"JOR20",n:"Bader Nasser"}]}
+]},
+// K: POR COD UZB COL  ← verificado del álbum
+{g:"K",label:"Portugal · Congo DR · Uzbekistán · Colombia",teams:[
+  {id:"POR",name:"Portugal",flag:"🇵🇹",pg:90,st:[
+    {c:"POR1",n:"Escudo",f:1},{c:"POR2",n:"Diogo Costa"},{c:"POR3",n:"Rui Patrício"},
+    {c:"POR4",n:"Rúben Dias"},{c:"POR5",n:"Pepe"},{c:"POR6",n:"Gonçalo Inácio"},
+    {c:"POR7",n:"João Cancelo"},{c:"POR8",n:"Nuno Mendes"},{c:"POR9",n:"Vitinha"},
+    {c:"POR10",n:"Bruno Fernandes"},{c:"POR11",n:"Bernardo Silva"},{c:"POR12",n:"João Palhinha"},
+    {c:"POR13",n:"Foto Equipo"},{c:"POR14",n:"Cristiano Ronaldo"},{c:"POR15",n:"Rafael Leão"},
+    {c:"POR16",n:"Pedro Neto"},{c:"POR17",n:"Gonçalo Ramos"},{c:"POR18",n:"Diogo Jota"},
+    {c:"POR19",n:"João Félix"},{c:"POR20",n:"Francisco Conceição"}]},
+  {id:"COD",name:"Congo DR",flag:"🇨🇩",pg:92,st:[
+    {c:"COD1",n:"Escudo",f:1},{c:"COD2",n:"Lionel Mpasi"},{c:"COD3",n:"Aaron Wan-Bissaka"},
+    {c:"COD4",n:"Axel Tuanzebe"},{c:"COD5",n:"Arthur Masuaku"},{c:"COD6",n:"Chancel Mbemba"},
+    {c:"COD7",n:"Joris Kayembe"},{c:"COD8",n:"Charles Pickel"},{c:"COD9",n:"Ngal'ayel Mukau"},
+    {c:"COD10",n:"Edo Kayembe"},{c:"COD11",n:"Samuel Moutoussamy"},{c:"COD12",n:"Noah Sadiki"},
+    {c:"COD13",n:"Foto Equipo"},{c:"COD14",n:"Théo Bongonda"},{c:"COD15",n:"Meschak Elia"},
+    {c:"COD16",n:"Yoane Wissa"},{c:"COD17",n:"Brian Cipenga"},{c:"COD18",n:"Fiston Mayele"},
+    {c:"COD19",n:"Cédric Bakambu"},{c:"COD20",n:"Nathanaël Mbuku"}]},
+  {id:"UZB",name:"Uzbekistán",flag:"🇺🇿",pg:94,st:[
+    {c:"UZB1",n:"Escudo",f:1},{c:"UZB2",n:"Utkir Yusupov"},{c:"UZB3",n:"Farrukh Savfiev"},
+    {c:"UZB4",n:"Sherzod Nasrullaev"},{c:"UZB5",n:"Umar Eshmurodov"},{c:"UZB6",n:"Husniddin Aliqulov"},
+    {c:"UZB7",n:"Rustamjon Ashurmatov"},{c:"UZB8",n:"Khojiakbar Alijonov"},{c:"UZB9",n:"Abdukodir Khusanov"},
+    {c:"UZB10",n:"Odiljon Hamrobekov"},{c:"UZB11",n:"Otabek Shukurov"},{c:"UZB12",n:"Jamshid Iskanderov"},
+    {c:"UZB13",n:"Foto Equipo"},{c:"UZB14",n:"Otabek Sayfiev"},{c:"UZB15",n:"Abbosbek Fayzullaev"},
+    {c:"UZB16",n:"Eldor Shomurodov"},{c:"UZB17",n:"Jaloliddin Masharipov"},{c:"UZB18",n:"D. Khamdamov"},
+    {c:"UZB19",n:"Behruz Komilov"},{c:"UZB20",n:"Shamsiddin Shomurodov"}]},
+  {id:"COL",name:"Colombia",flag:"🇨🇴",pg:96,st:[
+    {c:"COL1",n:"Escudo",f:1},{c:"COL2",n:"Camilo Vargas"},{c:"COL3",n:"David Ospina"},
+    {c:"COL4",n:"Dávinson Sánchez"},{c:"COL5",n:"Yerry Mina"},{c:"COL6",n:"Daniel Munoz"},
+    {c:"COL7",n:"Johan Mojica"},{c:"COL8",n:"Jhon Lucumí"},{c:"COL9",n:"Santiago Arias"},
+    {c:"COL10",n:"Jefferson Lerma"},{c:"COL11",n:"Kevin Castaño"},{c:"COL12",n:"Richard Rios"},
+    {c:"COL13",n:"Foto Equipo"},{c:"COL14",n:"James Rodríguez"},{c:"COL15",n:"J.F. Quintero"},
+    {c:"COL16",n:"Jorge Carrascal"},{c:"COL17",n:"Jhon Arias"},{c:"COL18",n:"Jhon Córdoba"},
+    {c:"COL19",n:"Luis Suárez (Col)"},{c:"COL20",n:"Luis Díaz"}]}
+]},
+// L: ENG CRO GHA PAN  ← verificado del álbum
+{g:"L",label:"Inglaterra · Croacia · Ghana · Panamá",teams:[
+  {id:"ENG",name:"Inglaterra",flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿",pg:98,st:[
+    {c:"ENG1",n:"Escudo",f:1},{c:"ENG2",n:"Jordan Pickford"},{c:"ENG3",n:"Aaron Ramsdale"},
+    {c:"ENG4",n:"John Stones"},{c:"ENG5",n:"Harry Maguire"},{c:"ENG6",n:"Marc Guéhi"},
+    {c:"ENG7",n:"Trent Alexander-Arnold"},{c:"ENG8",n:"Luke Shaw"},{c:"ENG9",n:"Declan Rice"},
+    {c:"ENG10",n:"Jude Bellingham"},{c:"ENG11",n:"Kobbie Mainoo"},{c:"ENG12",n:"Conor Gallagher"},
+    {c:"ENG13",n:"Foto Equipo"},{c:"ENG14",n:"Harry Kane"},{c:"ENG15",n:"Phil Foden"},
+    {c:"ENG16",n:"Bukayo Saka"},{c:"ENG17",n:"Marcus Rashford"},{c:"ENG18",n:"Jarrod Bowen"},
+    {c:"ENG19",n:"Cole Palmer"},{c:"ENG20",n:"Anthony Gordon"}]},
+  {id:"CRO",name:"Croacia",flag:"🇭🇷",pg:100,st:[
+    {c:"CRO1",n:"Escudo",f:1},{c:"CRO2",n:"Dominik Livaković"},{c:"CRO3",n:"Ivo Grbić"},
+    {c:"CRO4",n:"Dejan Lovren"},{c:"CRO5",n:"Domagoj Vida"},{c:"CRO6",n:"Joško Gvardiol"},
+    {c:"CRO7",n:"Josip Juranović"},{c:"CRO8",n:"Borna Sosa"},{c:"CRO9",n:"Luka Modrić"},
+    {c:"CRO10",n:"Mateo Kovačić"},{c:"CRO11",n:"Marcelo Brozović"},{c:"CRO12",n:"Ivan Perišić"},
+    {c:"CRO13",n:"Foto Equipo"},{c:"CRO14",n:"Andrej Kramarić"},{c:"CRO15",n:"Ante Rebić"},
+    {c:"CRO16",n:"Bruno Petković"},{c:"CRO17",n:"Mario Pašalić"},{c:"CRO18",n:"Nikola Vlašić"},
+    {c:"CRO19",n:"Lovro Majer"},{c:"CRO20",n:"Luka Ivanušec"}]},
+  {id:"GHA",name:"Ghana",flag:"🇬🇭",pg:102,st:[
+    {c:"GHA1",n:"Escudo",f:1},{c:"GHA2",n:"Lawrence Ati Zigi"},{c:"GHA3",n:"Richard Ofori"},
+    {c:"GHA4",n:"Alexander Djiku"},{c:"GHA5",n:"Joseph Aidoo"},{c:"GHA6",n:"Abdul Mumin"},
+    {c:"GHA7",n:"Tariq Lamptey"},{c:"GHA8",n:"Baba Rahman"},{c:"GHA9",n:"D. K. Kyereh"},
+    {c:"GHA10",n:"Thomas Partey"},{c:"GHA11",n:"Mohammed Kudus"},{c:"GHA12",n:"Andre Ayew"},
+    {c:"GHA13",n:"Foto Equipo"},{c:"GHA14",n:"Jordan Ayew"},{c:"GHA15",n:"Osman Bukari"},
+    {c:"GHA16",n:"Inaki Williams"},{c:"GHA17",n:"Antoine Semenyo"},{c:"GHA18",n:"Ernest Nuamah"},
+    {c:"GHA19",n:"Ransford Yeboah"},{c:"GHA20",n:"Abdul Fatawu"}]},
+  {id:"PAN",name:"Panamá",flag:"🇵🇦",pg:104,st:[
+    {c:"PAN1",n:"Escudo",f:1},{c:"PAN2",n:"Luis Mejía"},{c:"PAN3",n:"Orlando Mosquera"},
+    {c:"PAN4",n:"Fidel Escobar"},{c:"PAN5",n:"Edgardo Fariña"},{c:"PAN6",n:"Andrés Andrade"},
+    {c:"PAN7",n:"Éric Davis"},{c:"PAN8",n:"Adalberto Carrasquilla"},{c:"PAN9",n:"Roderick Miller"},
+    {c:"PAN10",n:"Cristian Martínez"},{c:"PAN11",n:"Édgar Bárcenas"},{c:"PAN12",n:"Anibal Godoy"},
+    {c:"PAN13",n:"Foto Equipo"},{c:"PAN14",n:"Rolando Blackburn"},{c:"PAN15",n:"Ismael Díaz"},
+    {c:"PAN16",n:"Cecilio Waterman"},{c:"PAN17",n:"Maximiliano Woodley"},{c:"PAN18",n:"José Fajardo"},
+    {c:"PAN19",n:"Gabriel Torres"},{c:"PAN20",n:"Roberto 'Tata' Brown"}]}
+]}
+];
+
+// ── STORAGE — funciona en iPhone local file (Safari bloquea localStorage) ─────
+const STORE_KEY='panini26_v3';
+function storageGet(){
+  try{const v=localStorage.getItem(STORE_KEY);return v?JSON.parse(v):{};}
+  catch(e){return{};}
+}
+function storageSave(data){
+  try{localStorage.setItem(STORE_KEY,JSON.stringify(data));}
+  catch(e){
+    // fallback: guardar en cookie (funciona en Safari local)
+    try{document.cookie=STORE_KEY+'='+encodeURIComponent(JSON.stringify(data))+';max-age=31536000;path=/';}
+    catch(e2){}
+  }
+}
+function cookieGet(){
+  try{
+    const m=document.cookie.match(new RegExp('(?:^|; )'+STORE_KEY+'=([^;]*)'));
+    return m?JSON.parse(decodeURIComponent(m[1])):{};
+  }catch(e){return{};}
+}
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let owned=(function(){const a=storageGet();const b=cookieGet();return Object.keys(a).length?a:b;})();
+let fMode='all';
+function save(){storageSave(owned);}
+
+// ── REPETIDAS (cambios) ────────────────────────────────────────────────────────
+const DUP_KEY='panini26_dupes_v1';
+function dupesGet(){try{const v=localStorage.getItem(DUP_KEY);return v?JSON.parse(v):{};}catch(e){return{};}}
+let dupes=dupesGet();
+function dupesSave(){try{localStorage.setItem(DUP_KEY,JSON.stringify(dupes));}catch(e){
+  try{document.cookie=DUP_KEY+'='+encodeURIComponent(JSON.stringify(dupes))+';max-age=31536000;path=/';}catch(e2){}}}
+function addDup(code,el){
+  if(!owned[code]){owned[code]=true;save();} // si marcas repe, tambien la tienes
+  dupes[code]=(dupes[code]||0)+1;dupesSave();
+  toast('🔁 '+code+' ×'+dupes[code]+' repetida(s)');
+  const tid=findTid(code);if(tid){refreshTeam(tid);refreshGroup(tid);}
+  updateStats();renderDupBadge(code,el);
+}
+function subDup(code,el){
+  if(!dupes[code])return;
+  dupes[code]--;if(dupes[code]<=0)delete dupes[code];dupesSave();
+  toast('🔁 '+code+(dupes[code]?' ×'+dupes[code]:' sin repetidas'),true);
+  updateStats();renderDupBadge(code,el);
+}
+function renderDupBadge(code,srcEl){
+  const cell=(srcEl&&srcEl.closest)?srcEl.closest('.s'):document.querySelector(`.s[data-c="${code}"]`);
+  if(!cell)return;
+  let b=cell.querySelector('.dupb');
+  const n=dupes[code]||0;
+  if(n>0){
+    if(!b){b=document.createElement('div');b.className='dupb';
+      b.onclick=function(e){e.stopPropagation();subDup(code,b);};
+      cell.appendChild(b);}
+    b.textContent='×'+n;
+  }else if(b)b.remove();
+}
+
+// ── EXPORTAR / IMPORTAR progreso (respaldo anti-perdida, clave en iPhone) ──────
+// En Safari iOS sobre file:// el localStorage se puede borrar; esto deja al
+// usuario respaldar su album en Notas/WhatsApp y restaurarlo cuando quiera.
+function exportData(){
+  const codes=Object.keys(owned).filter(c=>owned[c]);
+  const dl=Object.keys(dupes).filter(c=>dupes[c]>0).map(c=>c+'*'+dupes[c]);
+  let txt='PANINI26:'+codes.join(',');
+  if(dl.length)txt+=';DUP:'+dl.join(',');
+  const done=()=>toast('✅ Copiado: pegalo en Notas para respaldar');
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(done).catch(()=>fallbackPrompt(txt));
+  }else{fallbackPrompt(txt);}
+}
+function fallbackPrompt(txt){
+  // Si no hay clipboard, mostramos el codigo para copiar a mano
+  window.prompt('Copia este codigo y guardalo (Notas/WhatsApp):',txt);
+}
+// ── MODAL "CAMBIOS": faltantes para comprar + repetidas para ofrecer ──────────
+function closeModal(){document.getElementById('modal').classList.remove('open');}
+function showCambios(){
+  const all=allSt();
+  const faltan=all.filter(s=>!owned[s.c]).map(s=>s.c);
+  const repes=Object.keys(dupes).filter(c=>dupes[c]>0).map(c=>c+'×'+dupes[c]);
+  const fTxt=faltan.join(', ')||'¡Ninguna, álbum completo! 🎉';
+  const rTxt=repes.join(', ')||'Aún no marcas repetidas (toca el + en una estampa que ya tengas)';
+  document.getElementById('modalTitle').textContent='🔁 Para el puesto / cambios';
+  document.getElementById('modalBody').innerHTML=
+    `<div class="cbk"><h4 class="red">⬇️ Me faltan (${faltan.length}) — para comprar</h4>`+
+    `<div class="codes" id="cFaltan">${fTxt}</div>`+
+    (faltan.length?`<button class="cpy" onclick="copyText(document.getElementById('cFaltan').textContent,this)">Copiar faltantes</button>`:'')+
+    `</div>`+
+    `<div class="cbk"><h4 class="green">🔁 Tengo repetidas (${repes.length}) — para ofrecer</h4>`+
+    `<div class="codes" id="cRepes">${rTxt}</div>`+
+    (repes.length?`<button class="cpy" onclick="copyText(document.getElementById('cRepes').textContent,this)">Copiar repetidas</button>`:'')+
+    `</div>`;
+  document.getElementById('modal').classList.add('open');
+}
+function copyText(txt,btn){
+  const ok=()=>{const o=btn.textContent;btn.textContent='✓ Copiado';setTimeout(()=>btn.textContent=o,1500);};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(ok).catch(()=>window.prompt('Copia:',txt));}
+  else window.prompt('Copia:',txt);
+}
+function importData(){
+  const txt=window.prompt('Pega aqui tu codigo de respaldo (empieza con PANINI26:):','');
+  if(!txt)return;
+  let body=txt.trim().replace(/^PANINI26:/,'');
+  if(!body){toast('❌ Codigo vacio',true);return;}
+  // Separar parte de owned y parte de repetidas (;DUP:)
+  let dupPart='';
+  const di=body.indexOf(';DUP:');
+  if(di>=0){dupPart=body.slice(di+5);body=body.slice(0,di);}
+  const codes=body.split(',').map(s=>s.trim()).filter(Boolean);
+  if(!codes.length){toast('❌ Codigo invalido',true);return;}
+  owned={};codes.forEach(c=>{owned[c]=true;});
+  dupes={};
+  if(dupPart){dupPart.split(',').forEach(p=>{const[c,n]=p.split('*');if(c)dupes[c.trim()]=parseInt(n)||1;});}
+  save();dupesSave();renderAll();
+  toast('✅ Restauradas '+codes.length+' estampas'+(Object.keys(dupes).length?' + repetidas':''));
+}
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+function allSt(){
+  const a=[];
+  INTRO.stickers.forEach(s=>a.push({c:s.code,tid:'INTRO'}));
+  COCA.stickers.forEach(s=>a.push({c:s.code,tid:'COCA'}));
+  GROUPS.forEach(g=>g.teams.forEach(t=>t.st.forEach(s=>a.push({c:s.c,tid:t.id}))));
+  return a;
+}
+function teamById(id){
+  if(id==='INTRO')return INTRO;
+  if(id==='COCA')return COCA;
+  for(const g of GROUPS)for(const t of g.teams)if(t.id===id)return t;
+  return null;
+}
+function groupOf(id){for(const g of GROUPS)for(const t of g.teams)if(t.id===id)return g;return null}
+function oCount(arr){return arr.filter(s=>owned[s.c||s.code]).length}
+function stArr(t){return t.st||t.stickers||[]}
+// Normaliza para buscar: minusculas y SIN acentos ("México"->"mexico")
+function norm(s){return (s||'').toLowerCase().normalize('NFD').split('').filter(function(ch){var k=ch.charCodeAt(0);return k<768||k>879;}).join('');}
+
+// ── STATS ─────────────────────────────────────────────────────────────────────
+function updateStats(){
+  const all=allSt();
+  const total=all.length,o=all.filter(s=>owned[s.c]).length;
+  const pct=total?Math.round(o/total*100):0;
+  document.getElementById('pPct').textContent=pct+'%';
+  document.getElementById('pBar').style.width=pct+'%';
+  document.getElementById('pOwned').textContent=o;
+  document.getElementById('pMiss').textContent=total-o;
+  document.getElementById('pTotal').textContent=total;
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function sEl(s,isCoca){
+  const c=s.c||s.code,n=s.n||s.name;
+  const on=owned[c]?'on':'';
+  const fc=s.f?'foil':(s.coca||isCoca)?'coca':'';
+  const disp=s.f?'★':(s.coca||isCoca)?'🥤':(c.replace(/[A-Za-z]+/g,'').replace(/^0+/,'')||c);
+  const nd=dupes[c]||0;
+  return`<div class="s ${on} ${fc}" data-c="${c}" onclick="tap('${c}',this)">
+    <div class="sc">${c}</div><div class="sn">${disp}</div>
+    <div class="sl">${n}</div><div class="sck">✓</div>
+    <div class="dadd" title="Tengo otra (repetida)" onclick="event.stopPropagation();addDup('${c}',this)">+</div>
+    ${nd>0?`<div class="dupb" onclick="event.stopPropagation();subDup('${c}',this)">×${nd}</div>`:''}
+  </div>`;
+}
+function spHTML(sec){
+  const sts=stArr(sec);
+  const o=oCount(sts);
+  return`<div class="spc${sec.isCoca?' coca':''}" id="T_${sec.id}">
+    <div class="spc-hdr" onclick="tog('${sec.id}')">
+      <span class="spc-icon">${sec.flag}</span>
+      <span class="spc-title">${sec.name}</span>
+      <span class="spc-prog" id="SP_${sec.id}">${o}/${sts.length}</span>
+      <span class="chev" id="CH_${sec.id}">▼</span>
+    </div>
+    <div class="panel" id="PN_${sec.id}">
+      <div class="sgrid">${sts.map(s=>sEl(s,sec.isCoca)).join('')}</div>
+    </div>
+  </div>`;
+}
+// Mapa codigo FIFA (3 letras del album) -> ISO 2 letras para flagcdn.
+// gb-eng / gb-sct = banderas propias de Inglaterra y Escocia.
+const ISO2={MEX:'mx',RSA:'za',KOR:'kr',CZE:'cz',CAN:'ca',BIH:'ba',QAT:'qa',SUI:'ch',
+BRA:'br',MAR:'ma',HAI:'ht',SCO:'gb-sct',USA:'us',PAR:'py',AUS:'au',TUR:'tr',GER:'de',
+CUW:'cw',CIV:'ci',ECU:'ec',NED:'nl',JPN:'jp',SWE:'se',TUN:'tn',BEL:'be',EGY:'eg',
+IRN:'ir',NZL:'nz',ESP:'es',CPV:'cv',KSA:'sa',URU:'uy',FRA:'fr',SEN:'sn',IRQ:'iq',
+NOR:'no',ARG:'ar',ALG:'dz',AUT:'at',JOR:'jo',POR:'pt',COD:'cd',UZB:'uz',COL:'co',
+ENG:'gb-eng',CRO:'hr',GHA:'gh',PAN:'pa'};
+function flagImg(id,emoji){
+  const c=ISO2[id];
+  if(!c)return emoji||'⚽';
+  return `<img loading="lazy" src="https://flagcdn.com/w80/${c}.png" alt="${id}" `+
+         `onerror="this.replaceWith(document.createTextNode('${emoji||'⚽'}'))">`;
+}
+function tcHTML(t){
+  const sts=t.st;
+  const o=oCount(sts),total=sts.length,pct=Math.round(o/total*100),done=o===total;
+  const mc=sts.filter(s=>!owned[s.c]).map(s=>s.c).join(' · ');
+  return`<div class="tcard${done?' done':''}" id="T_${t.id}" data-s="${norm(t.name)} ${sts.map(s=>norm(s.n)).join(' ')}">
+    <div class="thdr" onclick="tog('${t.id}')">
+      <span class="tflag">${flagImg(t.id,t.flag)}</span>
+      <div class="tinfo">
+        <div class="tname">${t.name} <span style="font-size:10px;color:#445;font-weight:600">· pág. ${t.pg}</span></div>
+        <div class="tsub" id="SB_${t.id}">${o} de ${total} estampillas</div>
+      </div>
+      <div class="tbar-wrap">
+        <div class="tbar"><div class="tbar-fill" id="BF_${t.id}" style="width:${pct}%"></div></div>
+        <div class="tpct" id="PT_${t.id}">${pct}%</div>
+      </div>
+      <div class="badge${done?' on':''}" id="BD_${t.id}">✓</div>
+      <span class="chev" id="CH_${t.id}">▼</span>
+    </div>
+    <div class="panel" id="PN_${t.id}">
+      <div class="sgrid">${sts.map(s=>sEl(s)).join('')}</div>
+      ${mc?`<div class="miss" id="ML_${t.id}"><div class="miss-t">⚠ Faltan</div><div class="miss-c" id="MC_${t.id}">${mc}</div></div>`:''}
+      <button class="reset" onclick="event.stopPropagation();resetT('${t.id}')">↺ Resetear ${t.name}</button>
+    </div>
+  </div>`;
+}
+function renderAll(){
+  let html=spHTML(INTRO)+spHTML(COCA);
+  GROUPS.forEach(g=>{
+    const sts=g.teams.flatMap(t=>t.st);
+    const o=oCount(sts);
+    html+=`<div class="grp-hdr">
+      <span class="grp-pill">Grupo ${g.g}</span>
+      <span class="grp-teams">${g.label}</span>
+      <span class="grp-prog" id="GP_${g.g}">${o}/${sts.length}</span>
+    </div>`;
+    g.teams.forEach(t=>{html+=tcHTML(t);});
+  });
+  document.getElementById('wrap').innerHTML=html;
+  updateStats();
+}
+
+// ── INTERACTIONS ──────────────────────────────────────────────────────────────
+function findTid(code){
+  for(const s of INTRO.stickers)if(s.code===code)return'INTRO';
+  for(const s of COCA.stickers)if(s.code===code)return'COCA';
+  for(const g of GROUPS)for(const t of g.teams)if(t.st.some(s=>s.c===code))return t.id;
+  return null;
+}
+function tap(code,el){
+  owned[code]=!owned[code];save();
+  el.classList.toggle('on',owned[code]);
+  // Si la quito, ya no puede tener repetidas
+  if(!owned[code]&&dupes[code]){delete dupes[code];dupesSave();renderDupBadge(code,el);}
+  toast(owned[code]?'✅ ¡Conseguida!':'❌ Eliminada',!owned[code]);
+  const tid=findTid(code);
+  if(tid){refreshTeam(tid);refreshGroup(tid);}
+  updateStats();
+}
+function refreshTeam(id){
+  const t=teamById(id);if(!t)return;
+  const sts=stArr(t);
+  const o=oCount(sts),total=sts.length;
+  if(t.special){const sp=document.getElementById(`SP_${id}`);if(sp)sp.textContent=`${o}/${total}`;return;}
+  const pct=Math.round(o/total*100),done=o===total;
+  const card=document.getElementById(`T_${id}`);if(card)card.classList.toggle('done',done);
+  const sb=document.getElementById(`SB_${id}`);if(sb)sb.textContent=`${o} de ${total} estampillas`;
+  const bf=document.getElementById(`BF_${id}`);if(bf)bf.style.width=pct+'%';
+  const pt=document.getElementById(`PT_${id}`);if(pt)pt.textContent=pct+'%';
+  const bd=document.getElementById(`BD_${id}`);if(bd)bd.classList.toggle('on',done);
+  const mc=sts.filter(s=>!owned[s.c]).map(s=>s.c).join(' · ');
+  const panel=document.getElementById(`PN_${id}`);if(!panel)return;
+  let ml=document.getElementById(`ML_${id}`);
+  if(mc){
+    if(!ml){ml=document.createElement('div');ml.className='miss';ml.id=`ML_${id}`;ml.innerHTML=`<div class="miss-t">⚠ Faltan</div><div class="miss-c" id="MC_${id}"></div>`;panel.querySelector('.reset').before(ml);}
+    document.getElementById(`MC_${id}`).textContent=mc;
+  }else if(ml)ml.remove();
+}
+function refreshGroup(id){
+  const g=groupOf(id);if(!g)return;
+  const sts=g.teams.flatMap(t=>t.st);
+  const o=oCount(sts);
+  const el=document.getElementById(`GP_${g.g}`);if(el)el.textContent=`${o}/${sts.length}`;
+}
+function tog(id){
+  const p=document.getElementById(`PN_${id}`),c=document.getElementById(`CH_${id}`);
+  const open=p.classList.toggle('open');c.classList.toggle('open',open);
+}
+function resetT(id){
+  const t=teamById(id);if(!t||!confirm(`¿Resetear ${t.name}?`))return;
+  stArr(t).forEach(s=>{const c=s.c||s.code;delete owned[c];delete dupes[c];});save();dupesSave();
+  document.getElementById(`PN_${id}`).querySelectorAll('.s.on').forEach(e=>e.classList.remove('on'));
+  refreshTeam(id);refreshGroup(id);updateStats();
+}
+function setF(f,btn){fMode=f;document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');filterAll();}
+function filterAll(){
+  const q=norm(document.getElementById('qInput').value.trim());
+  document.querySelectorAll('.tcard').forEach(card=>{
+    const id=card.id.replace('T_','');
+    const t=teamById(id);if(!t||t.special)return;
+    const sts=t.st;
+    const o=oCount(sts);
+    const nm=!q||card.dataset.s.includes(q);
+    let show=nm;
+    if(fMode==='done')show=show&&o===sts.length;
+    if(fMode==='miss')show=show&&o<sts.length;
+    card.classList.toggle('hidden',!show);
+  });
+}
+let tt;
+function toast(msg,red){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.className='toast show'+(red?' red':'');
+  clearTimeout(tt);tt=setTimeout(()=>el.className='toast',1800);
+}
+// Render blindado: si algo falla (p.ej. en Safari iOS), muestra el error en
+// pantalla en vez de quedar TODO VACIO — asi siempre sabemos que paso.
+function safeRender(){
+  try{renderAll();}
+  catch(e){
+    var w=document.getElementById('wrap');
+    if(w)w.innerHTML='<div style="padding:24px;color:#ff8888;font-weight:700;line-height:1.6">'+
+      '⚠ Error al cargar el album:<br><br><code style="color:#ffd700;font-size:12px">'+
+      (e&&e.message?e.message:e)+'</code><br><br>Mandale esta pantalla a Claude.</div>';
+  }
+}
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',safeRender);
+}else{
+  safeRender();
+}
+</script>
+</body>
+</html>
