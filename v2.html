@@ -361,14 +361,12 @@ body{ background:linear-gradient(180deg,#0E2417 0%,#0B1E13 100%); }
   border-radius:12px; padding:14px; font-weight:800; font-size:15px; cursor:pointer; font-family:'Nunito',sans-serif; }
 .tut-cta:active{ transform:scale(.98); }
 
-/* ===================== QW1: RESUMEN (lo que me falta / mis repetidas) ===================== */
-/* Abre un modal LIGERO con chips por seleccion. NO filtra el grid de 994 (eso colgaba). */
-.vistas{ display:flex; align-items:center; gap:6px; max-width:960px; margin:0 auto; padding:0 12px 10px; flex-wrap:wrap; }
-.vistas-lbl{ font-size:12px; color:var(--texto-tenue); font-weight:700; }
-.vbtn{ background:rgba(255,255,255,.06); border:1px solid var(--borde); color:var(--texto-tenue);
-  border-radius:20px; padding:7px 13px; font-size:12.5px; font-weight:700; cursor:pointer; font-family:'Nunito',sans-serif; white-space:nowrap; }
-.vbtn:active{ transform:scale(.96); }
-/* Resumen dentro del modal generico */
+/* ===================== Listas (faltan/repes) inline dentro de Cambios ===================== */
+.xc-mini{ display:flex; gap:14px; flex-wrap:wrap; margin-top:10px; }
+.xc-link{ background:none; border:none; color:var(--lima); font-size:13px; font-weight:700; cursor:pointer;
+  font-family:'Nunito',sans-serif; padding:2px 0; text-decoration:underline; }
+.xc-mini-body{ margin-top:10px; }
+/* Lista por seleccion (rangos) */
 .res-sel{ background:var(--superficie-2); border:1px solid var(--borde); border-radius:10px; padding:10px 12px; margin-bottom:8px; }
 .res-h{ display:flex; align-items:center; gap:6px; font-weight:800; font-size:15px; color:var(--texto); margin-bottom:8px; }
 .res-cnt{ margin-left:auto; background:var(--fondo); color:var(--texto-tenue); font-size:12px; padding:2px 9px; border-radius:20px; }
@@ -411,11 +409,6 @@ body{ background:linear-gradient(180deg,#0E2417 0%,#0B1E13 100%); }
   <button class="fbtn iobtn" onclick="exportData()" title="Respaldar tu progreso">⬆️ Respaldo</button>
   <button class="fbtn iobtn" onclick="importData()" title="Restaurar progreso">⬇️ Restaurar</button>
   <button class="fbtn iobtn fbtn-help" onclick="showOnboarding(true)" title="Cómo se usa">❔</button>
-</div>
-<div class="vistas">
-  <span class="vistas-lbl">Ver:</span>
-  <button class="vbtn" onclick="verResumen('faltan')">🔻 Lo que me falta</button>
-  <button class="vbtn" onclick="verResumen('repes')">🔁 Mis repetidas</button>
 </div>
 <div id="casiListas" class="casi"></div>
 <div class="modal" id="modal" onclick="if(event.target===this)closeModal()">
@@ -1541,12 +1534,14 @@ const HTML_INTERCAMBIO=`<div class="xc">
         <span>Incluir lo que me falta (recomendado)</span></label>
       <div class="xc-actions">
         <button class="xc-btn xc-wa" onclick="enviarRepetidasWhatsApp()"><span class="xc-ico">📲</span> Enviar por WhatsApp</button>
-        <button class="xc-btn xc-ghost" onclick="copiarReporteRepetidas(this)">📋 Copiar texto</button>
+        <button class="xc-btn xc-ghost" onclick="copiarReporteRepetidas(this)">📋 Copiar</button>
       </div>
-      <div class="xc-actions" style="margin-top:8px">
-        <button class="xc-btn xc-ghost" onclick="enviarFaltantesWhatsApp()">🔲 Mandar lo que me falta</button>
-        <button class="xc-btn xc-ghost" onclick="copiarFaltantes(this)">📋 Copiar faltantes</button>
+      <div class="xc-mini">
+        <button class="xc-link" onclick="toggleMini('miniRep','repes')">🔁 ver mis repetidas</button>
+        <button class="xc-link" onclick="toggleMini('miniFal','faltan')">🔻 ver lo que me falta</button>
       </div>
+      <div id="miniRep" class="xc-mini-body" style="display:none"></div>
+      <div id="miniFal" class="xc-mini-body" style="display:none"></div>
     </div>
   </section>
   <div class="xc-sep"></div>
@@ -1628,36 +1623,24 @@ try{
    5) QUICK WINS: vistas Faltan/Repes · casi-listas · faltantes en rangos
    =================================================================== */
 
-/* --- QW1: Resumen ligero en modal (lo que me falta / mis repetidas) ---
-   NO filtra el grid de 994 estampas (eso colgaba el navegador con :has).
-   Arma chips por seleccion: rapido y claro. */
-function verResumen(modo){
-  var byTid={}, tot=0, titulo;
+/* --- Lista (faltan/repes) en rangos, desplegable inline dentro de Cambios --- */
+function _miniLista(modo){
+  var byTid={};
   if(modo==='faltan'){
-    allSt().forEach(function(o){ if(!owned[o.c]){ var n=numFromCode(o.c); if(n!=null){ (byTid[o.tid]=byTid[o.tid]||[]).push(n); tot++; } } });
-    titulo='🔻 Lo que me falta ('+tot+')';
+    allSt().forEach(function(o){ if(!owned[o.c]){ var n=numFromCode(o.c); if(n!=null){ (byTid[o.tid]=byTid[o.tid]||[]).push(n); } } });
   } else {
-    for(var code in dupes){ if(dupes[code]>0){ var tid=findTid(code); if(tid){ var n=numFromCode(code); if(n!=null){ (byTid[tid]=byTid[tid]||[]).push(n); tot++; } } } }
-    titulo='🔁 Mis repetidas ('+tot+')';
+    for(var code in dupes){ if(dupes[code]>0){ var tid=findTid(code); if(tid){ var n=numFromCode(code); if(n!=null){ (byTid[tid]=byTid[tid]||[]).push(n); } } } }
   }
   var tids=Object.keys(byTid).sort(function(a,b){ return tidMeta(a).name.localeCompare(tidMeta(b).name,'es'); });
-  var h='<div class="res">';
-  if(!tids.length){
-    h+='<p class="xc-empty">'+(modo==='faltan'?'¡No te falta ninguna! 🎉':'Aún no marcas repetidas. Toca una estampa que ya tengas para sumar una.')+'</p>';
-  } else {
-    h+='<div class="xc-actions" style="margin-bottom:12px">';
-    if(modo==='faltan'){ h+='<button class="xc-btn xc-wa" onclick="enviarFaltantesWhatsApp()">📲 Mandar por WhatsApp</button><button class="xc-btn xc-ghost" onclick="copiarFaltantes(this)">📋 Copiar</button>'; }
-    else { h+='<button class="xc-btn xc-wa" onclick="enviarRepetidasWhatsApp()">📲 Mandar por WhatsApp</button><button class="xc-btn xc-ghost" onclick="copiarReporteRepetidas(this)">📋 Copiar</button>'; }
-    h+='</div>';
-    tids.forEach(function(tid){ var m=tidMeta(tid); var nums=Array.from(new Set(byTid[tid])).sort(function(a,b){return a-b;});
-      h+='<div class="res-sel"><div class="res-h">'+(m.flag||'')+' '+m.name+'<span class="res-cnt">'+nums.length+'</span></div>'+
-         '<div class="res-nums">'+comprimirRangos(nums)+'</div></div>';
-    });
-  }
-  h+='</div>';
-  document.getElementById('modalTitle').textContent=titulo;
-  document.getElementById('modalBody').innerHTML=h;
-  document.getElementById('modal').classList.add('open');
+  if(!tids.length) return '<p class="xc-empty">'+(modo==='faltan'?'¡No te falta ninguna! 🎉':'Aún no marcas repetidas.')+'</p>';
+  return tids.map(function(tid){ var m=tidMeta(tid); var nums=Array.from(new Set(byTid[tid])).sort(function(a,b){return a-b;});
+    return '<div class="res-sel"><div class="res-h">'+(m.flag||'')+' '+m.name+'<span class="res-cnt">'+nums.length+'</span></div><div class="res-nums">'+comprimirRangos(nums)+'</div></div>';
+  }).join('');
+}
+function toggleMini(divId, modo){
+  var el=document.getElementById(divId); if(!el) return;
+  if(el.style.display!=='none' && el.innerHTML){ el.style.display='none'; return; }
+  el.innerHTML=_miniLista(modo); el.style.display='block';
 }
 
 /* --- QW2: lista de faltantes comprimida en rangos --- */
