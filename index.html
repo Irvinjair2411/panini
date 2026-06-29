@@ -326,6 +326,24 @@ body{ background:linear-gradient(180deg,#0E2417 0%,#0B1E13 100%); }
   font-family:'Bebas Neue',sans-serif; font-size:16px; letter-spacing:.5px; min-width:30px; padding:3px 9px; border-radius:8px; text-align:center; }
 @media (max-width:380px){ .xc-tots{ gap:6px; } .xc-tot b{ font-size:26px; } .xc-step-body h4{ font-size:18px; } }
 
+/* ===================== BOTONES COMPACTOS (barra de controles) ===================== */
+.controls{ gap:6px!important; padding:8px 12px 12px!important; justify-content:center; }
+.fbtn.iobtn{ flex:1 1 auto; min-width:0; justify-content:center; padding:8px 10px; font-size:12.5px; }
+.fbtn-help{ flex:0 0 auto!important; padding:8px 12px!important; font-size:15px!important; }
+
+/* ===================== MINI TUTORIAL (primera vez) ===================== */
+.tut{ display:flex; flex-direction:column; gap:13px; }
+.tut-row{ display:flex; gap:12px; align-items:flex-start; }
+.tut-ic{ flex:0 0 40px; height:40px; border-radius:11px; background:var(--superficie-2);
+  border:1px solid var(--borde); display:flex; align-items:center; justify-content:center; font-size:21px; }
+.tut-tx{ flex:1; min-width:0; }
+.tut-tx h4{ margin:0 0 2px; font-size:15px; color:var(--texto); }
+.tut-tx p{ margin:0; font-size:13px; color:var(--texto-tenue); line-height:1.45; }
+.tut-tx b{ color:var(--exito); }
+.tut-cta{ width:100%; margin-top:6px; background:var(--exito); color:#0E2417; border:none;
+  border-radius:12px; padding:14px; font-weight:800; font-size:15px; cursor:pointer; font-family:'Nunito',sans-serif; }
+.tut-cta:active{ transform:scale(.98); }
+
 </style>
 </head>
 <body>
@@ -350,15 +368,11 @@ body{ background:linear-gradient(180deg,#0E2417 0%,#0B1E13 100%); }
   </div>
 </div>
 <div class="controls">
-  <input class="search" id="qInput" type="text" placeholder="🔍 Buscar equipo o jugador..." oninput="filterAll()">
-  <button class="fbtn active" onclick="setF('all',this)">Todos</button>
-  <button class="fbtn" onclick="setF('miss',this)">Faltan</button>
-  <button class="fbtn" onclick="setF('done',this)">Completos</button>
-  <button class="fbtn iobtn" onclick="showCambios()" title="Lista para el puesto / cambios">🔁 Cambios</button>
-  <button class="fbtn iobtn" onclick="exportData()" title="Respaldar tu progreso">⬆️ Exportar</button>
-  <button class="fbtn iobtn" onclick="importData()" title="Restaurar progreso">⬇️ Importar</button>
   <button class="fbtn iobtn" onclick="abrirIntercambio()" title="Cambiar repetidas con un amigo por WhatsApp">🤝 Intercambio</button>
-  <button class="fbtn iobtn" onclick="openQuickCapture()" title="Marcar varias estampas tecleando codigos">⚡ Captura</button>
+  <button class="fbtn iobtn" onclick="openQuickCapture()" title="Marcar varias rápido">⚡ Captura</button>
+  <button class="fbtn iobtn" onclick="exportData()" title="Respaldar tu progreso">⬆️ Respaldo</button>
+  <button class="fbtn iobtn" onclick="importData()" title="Restaurar progreso">⬇️ Restaurar</button>
+  <button class="fbtn iobtn fbtn-help" onclick="showOnboarding(true)" title="Cómo se usa">❔</button>
 </div>
 <div class="modal" id="modal" onclick="if(event.target===this)closeModal()">
   <div class="modal-box">
@@ -711,10 +725,10 @@ const GROUPS=[
     {c:"SEN19",n:"Nicolas Jackson"},{c:"SEN20",n:"Krépin Diatta"}]},
   {id:"IRQ",name:"Iraq",flag:"🇮🇶",pg:78,st:[
     {c:"IRQ1",n:"Escudo",f:1},{c:"IRQ2",n:"Jalal Hassan"},{c:"IRQ3",n:"Rebin Sulaka"},
-    {c:"IRQ4",n:"Hassan Ali"},{c:"IRQ5",n:"Akam Hashim"},{c:"IRQ6",n:"Merchas Doski"},
+    {c:"IRQ4",n:"Hussein Ali"},{c:"IRQ5",n:"Akam Hashem"},{c:"IRQ6",n:"Merchas Doski"},
     {c:"IRQ7",n:"Zaid Tahseen"},{c:"IRQ8",n:"Manaf Younis"},{c:"IRQ9",n:"Zidane Iqbal"},
     {c:"IRQ10",n:"Amir Al-Ammari"},{c:"IRQ11",n:"Ibrahim Bayesh"},{c:"IRQ12",n:"Ali Jasim"},
-    {c:"IRQ13",n:"Foto Equipo"},{c:"IRQ14",n:"Youssef Amyn"},{c:"IRQ15",n:"Abbas Sheit"},
+    {c:"IRQ13",n:"Foto Equipo"},{c:"IRQ14",n:"Youssef Amyn"},{c:"IRQ15",n:"Aimar Sher"},
     {c:"IRQ16",n:"Marko Farji"},{c:"IRQ17",n:"Osama Rashid"},{c:"IRQ18",n:"Ali Al-Hamadi"},
     {c:"IRQ19",n:"Aymen Hussein"},{c:"IRQ20",n:"Mohanad Ali"}]},
   {id:"NOR",name:"Noruega",flag:"🇳🇴",pg:80,st:[
@@ -1121,7 +1135,7 @@ function resetT(id){
 }
 function setF(f,btn){fMode=f;document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');filterAll();}
 function filterAll(){
-  const q=norm(document.getElementById('qInput').value.trim());
+  var _qi=document.getElementById('qInput');const q=norm(_qi?_qi.value.trim():'');
   document.querySelectorAll('.tcard').forEach(card=>{
     const id=card.id.replace('T_','');
     const t=teamById(id);if(!t||t.special)return;
@@ -1478,6 +1492,30 @@ function renderResultadoCruce(res){
   }
   box.innerHTML=html; box.style.display='block';
 }
+
+/* ===================================================================
+   4) MINI TUTORIAL (se muestra solo la primera vez; reabrible con ❔)
+   =================================================================== */
+const HTML_ONBOARDING=`<div class="tut">
+  <div class="tut-row"><div class="tut-ic">👆</div><div class="tut-tx"><h4>Toca para marcar</h4><p>Un toque en una estampa = <b>la tengo</b> (se pone verde). Tócala otra vez para sumar una <b>repetida</b>.</p></div></div>
+  <div class="tut-row"><div class="tut-ic">🗑️</div><div class="tut-tx"><h4>Mantén pulsado para quitar</h4><p>¿Te equivocaste? Deja el dedo apretado en la estampa y se quita.</p></div></div>
+  <div class="tut-row"><div class="tut-ic">⚡</div><div class="tut-tx"><h4>Captura rápida</h4><p>¿Abriste un sobre? Toca <b>⚡ Captura</b> y teclea los números o códigos para marcar varias de un jalón.</p></div></div>
+  <div class="tut-row"><div class="tut-ic">🤝</div><div class="tut-tx"><h4>Cambia con tus amigos</h4><p>Toca <b>🤝 Intercambio</b>: manda tus repetidas por WhatsApp y pega las de tu amigo. La app te dice qué pedirle y qué darle.</p></div></div>
+  <div class="tut-row"><div class="tut-ic">☁️</div><div class="tut-tx"><h4>Se guarda solo</h4><p>Tu avance queda en tu teléfono. De vez en cuando usa <b>⬆️ Respaldo</b> para guardar una copia por si cambias de celular.</p></div></div>
+  <button class="tut-cta" onclick="cerrarOnboarding()">¡Entendido, a coleccionar! ⚽</button>
+</div>`;
+function showOnboarding(force){
+  try{ localStorage.setItem('panini26_onboard','1'); }catch(e){}
+  document.getElementById('modalTitle').textContent='👋 Bienvenido a tu álbum';
+  document.getElementById('modalBody').innerHTML=HTML_ONBOARDING;
+  document.getElementById('modal').classList.add('open');
+}
+function cerrarOnboarding(){ closeModal(); }
+// Mostrar la primera vez (no a quien ya tiene avance, p.ej. el dueño)
+try{
+  var _yaUsa = (typeof owned==='object') && Object.keys(owned).filter(function(k){return owned[k];}).length>3;
+  if(!localStorage.getItem('panini26_onboard') && !_yaUsa){ setTimeout(function(){ showOnboarding(true); },500); }
+}catch(e){}
 
 </script>
 </body>
