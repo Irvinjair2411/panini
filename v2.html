@@ -261,21 +261,38 @@ body{ background:linear-gradient(180deg,#0E2417 0%,#0B1E13 100%); }
   opacity:0; transition:opacity .25s; pointer-events:none; box-shadow:var(--sombra-pop); max-width:86vw; text-align:center; }
 .dup-hint.show{ opacity:1; }
 
-/* ===================== CAPTURA RÁPIDA (barra inferior) ===================== */
-#qc{ position:fixed; left:0; right:0; bottom:0; z-index:70; background:var(--superficie);
-  border-top:2px solid var(--primario);
-  padding:10px env(safe-area-inset-right) calc(10px + env(safe-area-inset-bottom)) env(safe-area-inset-left);
-  display:none; gap:8px; align-items:center; box-shadow:0 -10px 30px rgba(0,0,0,.5); }
-#qc.open{ display:flex; }
-#qcIn{ flex:1; min-width:0; background:var(--fondo); border:1px solid var(--borde);
-  border-radius:10px; color:var(--texto); padding:12px; font-size:16px; }
-#qcIn:focus{ outline:none; border-color:var(--lima); }
-#qc .qc-mode{ display:flex; align-items:center; gap:6px; font-size:12px; color:var(--texto-tenue); white-space:nowrap; }
-#qc .qc-mode input{ width:18px; height:18px; accent-color:var(--repe); }
-#qc .qc-go{ background:var(--exito); color:#0E2417; font-weight:800; border:none; border-radius:10px; padding:12px 16px; cursor:pointer; }
-#qc .qc-x{ background:var(--superficie-2); color:var(--texto-tenue); border:none; border-radius:10px; padding:12px; cursor:pointer; }
-#qc.dupmode{ border-top-color:var(--repe); }
-#qc.dupmode .qc-go{ background:var(--repe); color:#2a1500; }
+/* ===================== MODO SOBRE (pantalla completa) ===================== */
+.sobre{ position:fixed; inset:0; z-index:200; background:var(--fondo); display:none; flex-direction:column;
+  padding:max(14px,env(safe-area-inset-top)) 14px calc(14px + env(safe-area-inset-bottom)); overflow-y:auto; }
+.sobre.open{ display:flex; }
+.sb-top{ display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+.sb-title{ color:var(--texto); font-size:18px; font-weight:800; flex:1; }
+.sb-sel{ color:var(--texto); font-size:18px; font-weight:800; flex:1; display:flex; align-items:center; gap:8px; min-width:0; }
+.sb-sel span{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.sb-sel img,.sb-chip img{ width:24px; height:24px; border-radius:50%; object-fit:cover; vertical-align:middle; flex-shrink:0; }
+.sb-x,.sb-back{ background:var(--superficie-2); color:var(--texto-tenue); border:none; border-radius:10px; width:42px; height:42px; font-size:22px; cursor:pointer; flex-shrink:0; }
+.sb-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:8px; }
+.sb-chip{ background:var(--superficie-2); border:1px solid var(--borde); border-radius:12px; padding:12px;
+  display:flex; align-items:center; gap:8px; color:var(--texto); font-size:15px; font-weight:700; cursor:pointer; text-align:left; }
+.sb-chip span{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.sb-chip:active{ transform:scale(.97); border-color:var(--primario); }
+.sb-disp{ background:var(--superficie-2); border:1px solid var(--borde); border-radius:14px; padding:14px 18px;
+  display:flex; align-items:baseline; gap:12px; margin-bottom:14px; }
+.sb-disp-lbl{ color:var(--texto-tenue); font-size:13px; }
+.sb-num{ color:var(--texto); font-size:48px; font-weight:800; line-height:1; }
+.sb-feed{ display:flex; flex-direction:column; gap:7px; margin-bottom:12px; }
+.sb-row{ display:flex; align-items:center; gap:9px; font-size:15px; color:var(--texto); }
+.sb-ic{ font-size:12px; } .sb-ic.nueva{ color:var(--exito); } .sb-ic.repe{ color:var(--repe); }
+.sb-rn{ flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.sb-et{ font-size:13px; font-weight:800; } .sb-et.nueva{ color:var(--exito); } .sb-et.repe{ color:var(--repe); }
+.sb-cnt{ background:var(--superficie-2); border-radius:9px; padding:9px; text-align:center; color:var(--texto-tenue); font-size:14px; margin-bottom:14px; }
+.sb-cnt b.nueva{ color:var(--exito); } .sb-cnt b.repe{ color:var(--repe); }
+.sb-pad{ display:grid; grid-template-columns:repeat(3,1fr); gap:9px; margin-top:auto; }
+.sb-key{ background:var(--superficie-2); border:none; border-radius:12px; padding:16px 0; color:var(--texto); font-size:26px; font-weight:800; cursor:pointer; }
+.sb-key:active{ transform:scale(.96); }
+.sb-key-sec{ background:var(--borde); color:var(--texto-tenue); font-size:22px; }
+.sb-key-ok{ background:var(--exito); color:#0E2417; font-size:24px; }
+.sb-undo{ margin-top:12px; background:transparent; border:1px solid var(--borde); color:var(--repe); border-radius:10px; padding:11px; font-size:14px; font-weight:700; cursor:pointer; }
 
 /* ===================== INTERCAMBIO POR WHATSAPP ===================== */
 .xc{ display:flex; flex-direction:column; gap:14px; }
@@ -390,7 +407,7 @@ body{ background:linear-gradient(180deg,#0E2417 0%,#0B1E13 100%); }
 </div>
 <div class="controls">
   <button class="fbtn iobtn" onclick="abrirIntercambio()" title="Cambiar repetidas con un amigo por WhatsApp">🤝 Intercambio</button>
-  <button class="fbtn iobtn" onclick="openQuickCapture()" title="Marcar varias rápido">⚡ Captura</button>
+  <button class="fbtn iobtn" onclick="abrirSobre()" title="Abrir un sobre y marcar tecleando solo números">📦 Abrir sobre</button>
   <button class="fbtn iobtn" onclick="exportData()" title="Respaldar tu progreso">⬆️ Respaldo</button>
   <button class="fbtn iobtn" onclick="importData()" title="Restaurar progreso">⬇️ Restaurar</button>
   <button class="fbtn iobtn fbtn-help" onclick="showOnboarding(true)" title="Cómo se usa">❔</button>
@@ -1259,45 +1276,104 @@ function _dupHint(txt){
   wrap.addEventListener('mouseleave',up);
 })();
 
-/* ---------- 2) CAPTURA RÁPIDA: teclea códigos y márcalos de golpe ---------- */
-function _ensureQC(){
-  if(document.getElementById('qc')) return;
-  const bar=document.createElement('div'); bar.id='qc';
-  bar.innerHTML=`
-    <label class="qc-mode"><input type="checkbox" id="qcDup" onchange="_qcModeUI()"> Repetidas</label>
-    <input id="qcIn" inputmode="text" autocomplete="off" placeholder="Códigos: MEX1 MEX2, CC3  (o 1 2 5 con un equipo abierto)"
-           onkeydown="if(event.key==='Enter')commitQuickCapture()">
-    <button class="qc-go" onclick="commitQuickCapture()">OK</button>
-    <button class="qc-x" onclick="closeQuickCapture()">✕</button>`;
-  document.body.appendChild(bar);
+/* ---------- 2) MODO SOBRE: eliges la seleccion una vez y solo tecleas numeros ---------- */
+var _sobreTid=null, _sobreBuf='', _sobreSesion=[];
+
+function _ensureSobre(){
+  if(document.getElementById('sobre')) return;
+  var ov=document.createElement('div'); ov.id='sobre'; ov.className='sobre';
+  document.body.appendChild(ov);
 }
-function _qcModeUI(){ document.getElementById('qc').classList.toggle('dupmode',document.getElementById('qcDup').checked); }
-function openQuickCapture(){ _ensureQC(); document.getElementById('qc').classList.add('open');
-  const i=document.getElementById('qcIn'); i.value=''; setTimeout(()=>i.focus(),50); }
-function closeQuickCapture(){ const b=document.getElementById('qc'); if(b)b.classList.remove('open'); }
-function commitQuickCapture(){
-  const raw=document.getElementById('qcIn').value.trim(); if(!raw) return;
-  const dupMode=document.getElementById('qcDup').checked;
-  const tokens=raw.toUpperCase().split(/[\s,]+/).filter(Boolean);
-  const codesByTid=buildCodesByTid();
-  let ok=0, bad=[];
-  tokens.forEach(tok=>{
-    let [code,nStr]=tok.split('*'); const n=Math.max(1,parseInt(nStr)||1);
-    // Número "pelón" (1 2 5) + un equipo abierto en foco → resuelve a su código
-    if(/^\d+$/.test(code) && window._focusTid){
-      const set=codesByTid[window._focusTid];
-      const res=set?resolveCode(window._focusTid,parseInt(code,10),set):null;
-      if(res) code=res;
-    }
-    if(!findTid(code)){ bad.push(code); return; }
-    owned[code]=true;
-    if(dupMode) dupes[code]=(dupes[code]||0)+n;
-    ok++;
-  });
-  save(); dupesSave(); renderAll();
-  document.getElementById('qcIn').value='';
-  toast(ok+' marcadas'+(bad.length?'  ·  '+bad.length+' no encontradas':''), bad.length?true:false);
-  document.getElementById('qcIn').focus();
+function abrirSobre(){
+  _ensureSobre();
+  _sobreSesion=[]; _sobreBuf=''; _sobreTid=null;
+  _sobrePantalla1();
+  document.getElementById('sobre').classList.add('open');
+}
+function cerrarSobre(){
+  var ov=document.getElementById('sobre'); if(ov) ov.classList.remove('open');
+  renderAll();
+  var nv=_sobreSesion.filter(function(x){return x.tipo==='nueva';}).length;
+  var rp=_sobreSesion.filter(function(x){return x.tipo==='repe';}).length;
+  if(nv||rp) toast('Sobre: '+nv+' nuevas · '+rp+' repes');
+}
+/* Nombre del jugador a partir del codigo */
+function _nombreDe(code){
+  var tid=findTid(code); if(!tid) return code;
+  var arr=stArr(teamById(tid));
+  for(var i=0;i<arr.length;i++){ if((arr[i].c||arr[i].code)===code) return arr[i].n||arr[i].name; }
+  return code;
+}
+/* Pantalla 1: elegir la seleccion (una sola vez) */
+function _sobrePantalla1(){
+  _sobreTid=null;
+  function chip(id,flag,name){ return '<button class="sb-chip" onclick="sobreElegir(\''+id+'\')">'+flagImg(id,flag)+'<span>'+name+'</span></button>'; }
+  var chips=chip(INTRO.id,INTRO.flag,INTRO.name)+chip(COCA.id,COCA.flag,COCA.name);
+  GROUPS.forEach(function(g){ g.teams.forEach(function(t){ chips+=chip(t.id,t.flag,t.name); }); });
+  document.getElementById('sobre').innerHTML=
+    '<div class="sb-top"><span class="sb-title">¿De qué selección es el sobre?</span><button class="sb-x" onclick="cerrarSobre()">✕</button></div>'+
+    '<div class="sb-grid">'+chips+'</div>';
+}
+function sobreElegir(tid){ _sobreTid=tid; _sobreBuf=''; _sobrePantalla2(); }
+/* Pantalla 2: teclado numerico */
+function _sobrePantalla2(){
+  var m=tidMeta(_sobreTid);
+  var keys=[1,2,3,4,5,6,7,8,9].map(function(d){return '<button class="sb-key" onclick="sobreTecla('+d+')">'+d+'</button>';}).join('');
+  document.getElementById('sobre').innerHTML=
+    '<div class="sb-top"><button class="sb-back" onclick="_sobrePantalla1()">‹</button>'+
+      '<span class="sb-sel">'+flagImg(_sobreTid,m.flag)+' '+m.name+'</span>'+
+      '<button class="sb-x" onclick="cerrarSobre()">✕</button></div>'+
+    '<div class="sb-disp"><span class="sb-disp-lbl">estampa</span><span class="sb-num" id="sbNum">·</span></div>'+
+    '<div class="sb-feed" id="sbFeed"></div>'+
+    '<div class="sb-cnt" id="sbCnt"></div>'+
+    '<div class="sb-pad">'+keys+
+      '<button class="sb-key sb-key-sec" onclick="sobreBorrar()">⌫</button>'+
+      '<button class="sb-key" onclick="sobreTecla(0)">0</button>'+
+      '<button class="sb-key sb-key-ok" onclick="sobreMarcar()">✓</button></div>'+
+    '<button class="sb-undo" id="sbUndo" onclick="sobreDeshacer()" style="display:none">↶ Deshacer última</button>';
+  _sobreRender();
+}
+function sobreTecla(d){ if(_sobreBuf.length<2){ _sobreBuf+=(''+d); } var e=document.getElementById('sbNum'); if(e)e.textContent=_sobreBuf||'·'; }
+function sobreBorrar(){ _sobreBuf=_sobreBuf.slice(0,-1); var e=document.getElementById('sbNum'); if(e)e.textContent=_sobreBuf||'·'; }
+function sobreMarcar(){
+  var num=parseInt(_sobreBuf,10);
+  if(!num){ toast('Teclea un número',true); return; }
+  var set=buildCodesByTid()[_sobreTid];
+  var code=set?resolveCode(_sobreTid,num,set):null;
+  if(!code){ toast('La '+num+' no existe en '+tidMeta(_sobreTid).name,true); _sobreBuf=''; var e=document.getElementById('sbNum'); if(e)e.textContent='·'; return; }
+  var prevOwned=!!owned[code], prevDup=dupes[code]||0, tipo;
+  if(!owned[code]){ owned[code]=true; tipo='nueva'; }
+  else { dupes[code]=(dupes[code]||0)+1; tipo='repe'; }
+  save(); dupesSave();
+  _sobreSesion.push({code:code, num:num, name:_nombreDe(code), tipo:tipo, prevOwned:prevOwned, prevDup:prevDup});
+  if(navigator.vibrate) navigator.vibrate(15);
+  _sobreBuf='';
+  _sobreRender();
+}
+function sobreDeshacer(){
+  var last=_sobreSesion.pop(); if(!last) return;
+  if(last.prevOwned){ owned[last.code]=true; } else { delete owned[last.code]; }
+  if(last.prevDup>0){ dupes[last.code]=last.prevDup; } else { delete dupes[last.code]; }
+  save(); dupesSave();
+  toast('Deshecho: '+last.num, true);
+  _sobreRender();
+}
+function _sobreRender(){
+  var n=document.getElementById('sbNum'); if(n)n.textContent=_sobreBuf||'·';
+  var feed=document.getElementById('sbFeed');
+  if(feed){
+    feed.innerHTML=_sobreSesion.slice(-4).reverse().map(function(x){
+      var cls=x.tipo==='nueva'?'nueva':'repe';
+      return '<div class="sb-row"><span class="sb-ic '+cls+'">●</span><span class="sb-rn">'+x.num+' · '+x.name+'</span><span class="sb-et '+cls+'">'+(x.tipo==='nueva'?'nueva':'repe')+'</span></div>';
+    }).join('');
+  }
+  var cnt=document.getElementById('sbCnt');
+  if(cnt){
+    var nv=_sobreSesion.filter(function(x){return x.tipo==='nueva';}).length;
+    var rp=_sobreSesion.filter(function(x){return x.tipo==='repe';}).length;
+    cnt.innerHTML='Este sobre: <b class="nueva">'+nv+' nuevas</b> · <b class="repe">'+rp+' repes</b>';
+  }
+  var u=document.getElementById('sbUndo'); if(u)u.style.display=_sobreSesion.length?'block':'none';
 }
 
 /* ===================================================================
