@@ -344,6 +344,27 @@ body{ background:linear-gradient(180deg,#0E2417 0%,#0B1E13 100%); }
   border-radius:12px; padding:14px; font-weight:800; font-size:15px; cursor:pointer; font-family:'Nunito',sans-serif; }
 .tut-cta:active{ transform:scale(.98); }
 
+/* ===================== QW1: RESUMEN (lo que me falta / mis repetidas) ===================== */
+/* Abre un modal LIGERO con chips por seleccion. NO filtra el grid de 994 (eso colgaba). */
+.vistas{ display:flex; align-items:center; gap:6px; max-width:960px; margin:0 auto; padding:0 12px 10px; flex-wrap:wrap; }
+.vistas-lbl{ font-size:12px; color:var(--texto-tenue); font-weight:700; }
+.vbtn{ background:rgba(255,255,255,.06); border:1px solid var(--borde); color:var(--texto-tenue);
+  border-radius:20px; padding:7px 13px; font-size:12.5px; font-weight:700; cursor:pointer; font-family:'Nunito',sans-serif; white-space:nowrap; }
+.vbtn:active{ transform:scale(.96); }
+/* Resumen dentro del modal generico */
+.res-sel{ background:var(--superficie-2); border:1px solid var(--borde); border-radius:10px; padding:10px 12px; margin-bottom:8px; }
+.res-h{ display:flex; align-items:center; gap:6px; font-weight:800; font-size:15px; color:var(--texto); margin-bottom:8px; }
+.res-cnt{ margin-left:auto; background:var(--fondo); color:var(--texto-tenue); font-size:12px; padding:2px 9px; border-radius:20px; }
+.res-nums{ font-family:'Nunito',sans-serif; font-size:14.5px; color:var(--texto-tenue); font-weight:700; line-height:1.5; word-break:break-word; }
+
+/* ===================== QW4: TABLERO "CASI LISTAS" ===================== */
+.casi{ max-width:960px; margin:0 auto; padding:0 12px 12px; display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+.casi:empty{ display:none; padding:0; }
+.casi-lbl{ font-size:12px; color:var(--repe); font-weight:800; white-space:nowrap; }
+.casi-chip{ background:rgba(255,138,30,.14); border:1px solid var(--repe); color:#ffd9b0;
+  border-radius:20px; padding:5px 11px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; }
+.casi-chip:active{ transform:scale(.96); }
+
 </style>
 </head>
 <body>
@@ -374,6 +395,12 @@ body{ background:linear-gradient(180deg,#0E2417 0%,#0B1E13 100%); }
   <button class="fbtn iobtn" onclick="importData()" title="Restaurar progreso">⬇️ Restaurar</button>
   <button class="fbtn iobtn fbtn-help" onclick="showOnboarding(true)" title="Cómo se usa">❔</button>
 </div>
+<div class="vistas">
+  <span class="vistas-lbl">Ver:</span>
+  <button class="vbtn" onclick="verResumen('faltan')">🔻 Lo que me falta</button>
+  <button class="vbtn" onclick="verResumen('repes')">🔁 Mis repetidas</button>
+</div>
+<div id="casiListas" class="casi"></div>
 <div class="modal" id="modal" onclick="if(event.target===this)closeModal()">
   <div class="modal-box">
     <div class="modal-hd"><span id="modalTitle">Cambios</span><span class="modal-x" onclick="closeModal()">✕</span></div>
@@ -994,7 +1021,7 @@ function updateStats(){
   document.getElementById('pBar').style.width=pct+'%';
   document.getElementById('pOwned').textContent=o;
   document.getElementById('pMiss').textContent=total-o;
-  document.getElementById('pTotal').textContent=total;
+  document.getElementById('pTotal').textContent=total;if(typeof renderCasiListas==='function')renderCasiListas();
 }
 
 // ── RENDER ────────────────────────────────────────────────────────────────────
@@ -1418,12 +1445,12 @@ function copiarReporteRepetidas(btn){
   copyText(generarReporteRepetidas(inc),btn);
 }
 function compartirAcuerdoWhatsApp(res){
-  let t='🤝 PROPUESTA DE CAMBIO\n';
-  if(res.pidele.length){ t+=`\n📥 TE PIDO (${res.totPidele}):\n`;
-    res.pidele.forEach(sec=>{ t+=`${sec.tid} ${sec.flag||''}: ${sec.items.map(i=>i.num).join(', ')}\n`; }); }
-  if(res.ofrecele.length){ t+=`\n📤 TE DOY (${res.totOfrecele}):\n`;
-    res.ofrecele.forEach(sec=>{ t+=`${sec.tid} ${sec.flag||''}: ${sec.items.map(i=>i.num).join(', ')}\n`; }); }
-  if(!res.pidele.length&&!res.ofrecele.length) t+='\n(Sin coincidencias por ahora)';
+  function lineas(arr){ return arr.map(function(sec){ return sec.tid+' '+(sec.flag||'')+': '+comprimirRangos(sec.items.map(function(i){return i.num;})); }).join('\n'); }
+  var t='🤝 PROPUESTA DE CAMBIO\n';
+  if(res.pidele.length){ t+='\n📥 TE PIDO — me faltan ('+res.totPidele+'):\n'+lineas(res.pidele)+'\n'; }
+  if(res.ofrecele.length){ t+='\n📤 TE DOY — me sobran ('+res.totOfrecele+'):\n'+lineas(res.ofrecele)+'\n'; }
+  if(res.pidele.length||res.ofrecele.length){ t+='\n⚖️ Tú me das '+res.totPidele+', yo te doy '+res.totOfrecele+'.'; }
+  else { t+='\n(Sin coincidencias por ahora)'; }
   compartirWhatsApp(t.trim());
 }
 
@@ -1439,6 +1466,10 @@ const HTML_INTERCAMBIO=`<div class="xc">
       <div class="xc-actions">
         <button class="xc-btn xc-wa" onclick="enviarRepetidasWhatsApp()"><span class="xc-ico">📲</span> Enviar por WhatsApp</button>
         <button class="xc-btn xc-ghost" onclick="copiarReporteRepetidas(this)">📋 Copiar texto</button>
+      </div>
+      <div class="xc-actions" style="margin-top:8px">
+        <button class="xc-btn xc-ghost" onclick="enviarFaltantesWhatsApp()">🔲 Mandar lo que me falta</button>
+        <button class="xc-btn xc-ghost" onclick="copiarFaltantes(this)">📋 Copiar faltantes</button>
       </div>
     </div>
   </section>
@@ -1516,6 +1547,91 @@ try{
   var _yaUsa = (typeof owned==='object') && Object.keys(owned).filter(function(k){return owned[k];}).length>3;
   if(!localStorage.getItem('panini26_onboard') && !_yaUsa){ setTimeout(function(){ showOnboarding(true); },500); }
 }catch(e){}
+
+/* ===================================================================
+   5) QUICK WINS: vistas Faltan/Repes · casi-listas · faltantes en rangos
+   =================================================================== */
+
+/* --- QW1: Resumen ligero en modal (lo que me falta / mis repetidas) ---
+   NO filtra el grid de 994 estampas (eso colgaba el navegador con :has).
+   Arma chips por seleccion: rapido y claro. */
+function verResumen(modo){
+  var byTid={}, tot=0, titulo;
+  if(modo==='faltan'){
+    allSt().forEach(function(o){ if(!owned[o.c]){ var n=numFromCode(o.c); if(n!=null){ (byTid[o.tid]=byTid[o.tid]||[]).push(n); tot++; } } });
+    titulo='🔻 Lo que me falta ('+tot+')';
+  } else {
+    for(var code in dupes){ if(dupes[code]>0){ var tid=findTid(code); if(tid){ var n=numFromCode(code); if(n!=null){ (byTid[tid]=byTid[tid]||[]).push(n); tot++; } } } }
+    titulo='🔁 Mis repetidas ('+tot+')';
+  }
+  var tids=Object.keys(byTid).sort(function(a,b){ return tidMeta(a).name.localeCompare(tidMeta(b).name,'es'); });
+  var h='<div class="res">';
+  if(!tids.length){
+    h+='<p class="xc-empty">'+(modo==='faltan'?'¡No te falta ninguna! 🎉':'Aún no marcas repetidas. Toca una estampa que ya tengas para sumar una.')+'</p>';
+  } else {
+    h+='<div class="xc-actions" style="margin-bottom:12px">';
+    if(modo==='faltan'){ h+='<button class="xc-btn xc-wa" onclick="enviarFaltantesWhatsApp()">📲 Mandar por WhatsApp</button><button class="xc-btn xc-ghost" onclick="copiarFaltantes(this)">📋 Copiar</button>'; }
+    else { h+='<button class="xc-btn xc-wa" onclick="enviarRepetidasWhatsApp()">📲 Mandar por WhatsApp</button><button class="xc-btn xc-ghost" onclick="copiarReporteRepetidas(this)">📋 Copiar</button>'; }
+    h+='</div>';
+    tids.forEach(function(tid){ var m=tidMeta(tid); var nums=Array.from(new Set(byTid[tid])).sort(function(a,b){return a-b;});
+      h+='<div class="res-sel"><div class="res-h">'+(m.flag||'')+' '+m.name+'<span class="res-cnt">'+nums.length+'</span></div>'+
+         '<div class="res-nums">'+comprimirRangos(nums)+'</div></div>';
+    });
+  }
+  h+='</div>';
+  document.getElementById('modalTitle').textContent=titulo;
+  document.getElementById('modalBody').innerHTML=h;
+  document.getElementById('modal').classList.add('open');
+}
+
+/* --- QW2: lista de faltantes comprimida en rangos --- */
+function comprimirRangos(nums){
+  nums=nums.slice().sort(function(a,b){return a-b;});
+  var out=[],i=0;
+  while(i<nums.length){
+    var a=nums[i],b=a;
+    while(i+1<nums.length && nums[i+1]===nums[i]+1){ i++; b=nums[i]; }
+    out.push(a===b?(''+a):(a+'-'+b)); i++;
+  }
+  return out.join(', ');
+}
+function generarFaltantes(){
+  var byTid={};
+  allSt().forEach(function(o){ if(!owned[o.c]){ var n=numFromCode(o.c); if(n!=null){ (byTid[o.tid]=byTid[o.tid]||[]).push(n); } } });
+  var tids=Object.keys(byTid).sort(function(a,b){ return tidMeta(a).name.localeCompare(tidMeta(b).name,'es'); });
+  var tot=0,lines='';
+  tids.forEach(function(tid){ var m=tidMeta(tid); tot+=byTid[tid].length; lines+=tid+(m.flag?' '+m.flag:'')+': '+comprimirRangos(byTid[tid])+'\n'; });
+  return '🔲 ME FALTAN ('+tot+')\n'+lines.trim();
+}
+function copiarFaltantes(btn){ copyText(generarFaltantes(),btn); }
+function enviarFaltantesWhatsApp(){ var t=generarFaltantes(); if(/\(0\)/.test(t.split('\n')[0])){ toast('¡No te falta ninguna! 🎉'); return; } compartirWhatsApp(t); }
+
+/* --- QW4: tablero "casi listas" (1-3 para completar) --- */
+function _seccionesProgreso(){
+  var arr=[];
+  [INTRO,COCA].forEach(function(s){ var sts=stArr(s); arr.push({id:s.id,name:s.name,flag:s.flag,total:sts.length,o:sts.filter(function(x){return owned[x.c||x.code];}).length}); });
+  GROUPS.forEach(function(g){ g.teams.forEach(function(t){ arr.push({id:t.id,name:t.name,flag:t.flag,total:t.st.length,o:t.st.filter(function(x){return owned[x.c];}).length}); }); });
+  return arr;
+}
+function renderCasiListas(){
+  var box=document.getElementById('casiListas'); if(!box) return;
+  var secs=_seccionesProgreso();
+  var casi=secs.filter(function(s){ var f=s.total-s.o; return f>=1 && f<=3; })
+               .sort(function(a,b){ return (a.total-a.o)-(b.total-b.o); });
+  if(!casi.length){ box.innerHTML=''; return; }
+  var h='<span class="casi-lbl">🔥 Casi listas:</span>';
+  casi.slice(0,8).forEach(function(s){ var f=s.total-s.o;
+    h+='<span class="casi-chip" onclick="irA(\''+s.id+'\')">'+(s.flag||'')+' '+s.name+' · falta'+(f>1?'n':'')+' '+f+'</span>'; });
+  box.innerHTML=h;
+}
+function irA(id){
+  var el=document.getElementById('T_'+id); if(!el) return;
+  var pn=document.getElementById('PN_'+id), ch=document.getElementById('CH_'+id);
+  if(pn && !pn.classList.contains('open')){ pn.classList.add('open'); if(ch)ch.classList.add('open'); }
+  el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+// Pintar casi-listas al cargar (updateStats lo refresca en cada cambio)
+try{ renderCasiListas(); }catch(e){}
 
 </script>
 </body>
