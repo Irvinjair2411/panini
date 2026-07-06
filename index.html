@@ -1262,6 +1262,32 @@ if(document.readyState==='loading'){
 
 /* ---------- 1) GESTO en la celda: tap=tengo · 2º tap=repetida · mantener=quitar ---------- */
 let _lpFired=false;
+let _lastDeleted=null, _undoTimer=null;
+function _showUndoToast(code){
+  var el=document.getElementById('_undoToast');
+  if(!el){
+    el=document.createElement('div'); el.id='_undoToast';
+    el.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--superficie);border:1px solid var(--borde);border-radius:12px;padding:12px 16px;z-index:9999;display:flex;align-items:center;gap:12px;font-size:14px;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.5);';
+    document.body.appendChild(el);
+  }
+  el.innerHTML='🗑️ Quitada: <b>'+code+'</b>&nbsp;<button onclick="_undoDelete()" style="background:rgba(201,162,75,.18);color:var(--primario);border:1px solid rgba(201,162,75,.4);border-radius:8px;padding:4px 12px;font-size:13px;font-weight:700;cursor:pointer;">Deshacer</button>';
+  el.style.display='flex';
+  clearTimeout(_undoTimer);
+  _undoTimer=setTimeout(function(){ el.style.display='none'; _lastDeleted=null; },4000);
+}
+function _undoDelete(){
+  var el=document.getElementById('_undoToast'); if(el) el.style.display='none';
+  clearTimeout(_undoTimer);
+  if(!_lastDeleted) return;
+  var d=_lastDeleted; _lastDeleted=null;
+  owned[d.code]=true; save();
+  if(d.dupCount>0){ dupes[d.code]=d.dupCount; dupesSave(); }
+  var cell=document.querySelector('.s[data-c="'+d.code+'"]');
+  if(cell){ cell.classList.add('on'); if(d.dupCount>0) cell.classList.add('has-repe'); renderDupBadge(d.code,cell); }
+  var tid=findTid(d.code); if(tid){ refreshTeam(tid); refreshGroup(tid); }
+  updateStats();
+  toast('↩️ Restaurada: '+d.code);
+}
 function cellTap(code,el){
   if(_lpFired){_lpFired=false;return;}        // el "mantener para quitar" ya actuó
   if(!owned[code]){ tap(code,el); }            // 1er tap: la tengo (tap invierte false→true)
@@ -1289,13 +1315,15 @@ function _dupHint(txt){
       cell.classList.remove('pressing');
       const code=cell.dataset.c;
       if(code && owned[code]){
+        var prevDups=dupes[code]||0;
         owned[code]=false; save();
         if(dupes[code]){ delete dupes[code]; dupesSave(); }
         cell.classList.remove('on','has-repe'); renderDupBadge(code,cell);
         const tid=findTid(code); if(tid){ refreshTeam(tid); refreshGroup(tid); }
         updateStats();
         if(navigator.vibrate) navigator.vibrate(25);
-        toast('🗑️ Quitada: '+code,true);
+        _lastDeleted={code:code,dupCount:prevDups};
+        _showUndoToast(code);
         _lpFired=true;                          // evita que el click siguiente la re-marque
       }
     },LONG);
@@ -1495,7 +1523,7 @@ function parseLineaSeleccion(line){
   if(!limpio) return null;
   const m=limpio.match(/^([A-Za-z]{2,8})\s*[:\-]?\s*(.*)$/); if(!m) return null;
   const tid=m[1].toUpperCase();
-  const nums=(m[2].replace(/[×x]\d+/g,'').match(/\d+/g)||[]).map(n=>parseInt(n,10)).filter(n=>n>0);
+  const nums=(m[2].replace(/[×x]\d+/g,'').match(/\d+/g)||[]).map(n=>parseInt(n,10)).filter(n=>n>=0);
   return {tid,nums};
 }
 function dedupeSort(map){ for(const k in map) map[k]=Array.from(new Set(map[k])).sort((a,b)=>a-b); }
@@ -1842,7 +1870,7 @@ async function compartirQRImagen(btn){
   if(!url){ toast('Genera primero el QR',true); return; }
   if(btn){ btn.disabled=true; btn.textContent='⏳ Preparando...'; }
   try{
-    var blob=await fetch(imgSrc).then(function(r){ return r.blob(); });
+    var blob=await fetch(imgSrc).then(function(r){ if(!r.ok) throw new Error(r.status); return r.blob(); });
     var file=new File([blob],'qr-panini.png',{type:'image/png'});
     if(navigator.canShare&&navigator.canShare({files:[file]})){
       await navigator.share({
