@@ -1443,7 +1443,7 @@ function parseLineaSeleccion(line){
   if(!limpio) return null;
   const m=limpio.match(/^([A-Za-z]{2,8})\s*[:\-]?\s*(.*)$/); if(!m) return null;
   const tid=m[1].toUpperCase();
-  const nums=(m[2].match(/\d+/g)||[]).map(n=>parseInt(n,10)).filter(n=>n>0);
+  const nums=(m[2].replace(/[×x]\d+/g,'').match(/\d+/g)||[]).map(n=>parseInt(n,10)).filter(n=>n>0);
   return {tid,nums};
 }
 function dedupeSort(map){ for(const k in map) map[k]=Array.from(new Set(map[k])).sort((a,b)=>a-b); }
