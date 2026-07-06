@@ -256,11 +256,14 @@ body{ background:linear-gradient(180deg,#0E2417 0%,#0B1E13 100%); }
 .xc-qr-btn:active{ background:rgba(201,162,75,.22); }
 
 /* === Overlay QR (pantalla completa sobre el modal) === */
-.xc-qr-ov{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:500;
-  display:none;align-items:center;justify-content:center;padding:20px;}
+.xc-qr-ov{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:10000;
+  display:none;align-items:center;justify-content:center;
+  padding:20px;overflow-y:auto;}
 .xc-qr-ov.open{display:flex;}
 .xc-qr-box{background:var(--superficie);border:1px solid rgba(201,162,75,.3);
-  border-radius:20px;padding:20px;max-width:340px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.6);}
+  border-radius:20px;padding:20px;max-width:340px;width:100%;
+  max-height:calc(100vh - 40px);overflow-y:auto;
+  box-shadow:0 8px 40px rgba(0,0,0,.6);}
 .xc-qr-hd{display:flex;align-items:center;justify-content:space-between;
   margin-bottom:10px;font-weight:800;color:var(--primario);font-size:16px;}
 .xc-qr-hint{font-size:13px;color:var(--texto-tenue);margin-bottom:14px;line-height:1.5;}
