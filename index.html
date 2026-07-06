@@ -235,7 +235,8 @@ body{ background:linear-gradient(180deg,#0E2417 0%,#0B1E13 100%); }
 /* Estampa con REPETIDAS: realce naranja */
 .s.has-repe{ border-color:var(--repe); box-shadow:0 0 0 1px rgba(255,138,30,.45),0 0 10px rgba(255,138,30,.2); }
 .dupb{ background:linear-gradient(135deg,#FFA94D,var(--repe))!important; color:#2a1500!important; }
-.dadd{ background:rgba(201,162,75,.22); color:var(--primario); }
+.dadd{ background:rgba(201,162,75,.22); color:var(--primario); pointer-events:none; }
+.s.on .dadd{ pointer-events:auto; }
 .dadd:hover{ background:var(--primario); color:#0E2417; }
 
 /* Faltantes (texto) */
@@ -1392,8 +1393,16 @@ function generarReporteRepetidas(incluyeFaltan){
   }
   return out.trim();
 }
+function _albumOrd(){
+  if(_albumOrd._c) return _albumOrd._c;
+  const o={};let i=0;
+  [INTRO,COCA].forEach(s=>{o[s.id]=i++;});
+  (GROUPS||[]).forEach(g=>g.teams.forEach(t=>{o[t.id]=i++;}));
+  return(_albumOrd._c=o);
+}
 function linesFromByTid(byTid){
-  const tids=Object.keys(byTid).sort((a,b)=>tidMeta(a).name.localeCompare(tidMeta(b).name,'es'));
+  const ao=_albumOrd();
+  const tids=Object.keys(byTid).sort((a,b)=>(ao[a]??999)-(ao[b]??999));
   let s='';
   for(const tid of tids){
     const nums=Array.from(new Set(byTid[tid])).sort((a,b)=>a-b);
@@ -1631,7 +1640,7 @@ function _miniLista(modo){
   } else {
     for(var code in dupes){ if(dupes[code]>0){ var tid=findTid(code); if(tid){ var n=numFromCode(code); if(n!=null){ (byTid[tid]=byTid[tid]||[]).push(n); } } } }
   }
-  var tids=Object.keys(byTid).sort(function(a,b){ return tidMeta(a).name.localeCompare(tidMeta(b).name,'es'); });
+  var ao=_albumOrd(); var tids=Object.keys(byTid).sort(function(a,b){ return(ao[a]||999)-(ao[b]||999); });
   if(!tids.length) return '<p class="xc-empty">'+(modo==='faltan'?'¡No te falta ninguna! 🎉':'Aún no marcas repetidas.')+'</p>';
   return tids.map(function(tid){ var m=tidMeta(tid); var nums=Array.from(new Set(byTid[tid])).sort(function(a,b){return a-b;});
     return '<div class="res-sel"><div class="res-h">'+(m.flag||'')+' '+m.name+'<span class="res-cnt">'+nums.length+'</span></div><div class="res-nums">'+comprimirRangos(nums)+'</div></div>';
@@ -1657,7 +1666,7 @@ function comprimirRangos(nums){
 function generarFaltantes(){
   var byTid={};
   allSt().forEach(function(o){ if(!owned[o.c]){ var n=numFromCode(o.c); if(n!=null){ (byTid[o.tid]=byTid[o.tid]||[]).push(n); } } });
-  var tids=Object.keys(byTid).sort(function(a,b){ return tidMeta(a).name.localeCompare(tidMeta(b).name,'es'); });
+  var ao=_albumOrd(); var tids=Object.keys(byTid).sort(function(a,b){ return(ao[a]||999)-(ao[b]||999); });
   var tot=0,lines='';
   tids.forEach(function(tid){ var m=tidMeta(tid); tot+=byTid[tid].length; lines+=tid+(m.flag?' '+m.flag:'')+': '+comprimirRangos(byTid[tid])+'\n'; });
   return '🔲 ME FALTAN ('+tot+')\n'+lines.trim();
