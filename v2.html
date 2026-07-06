@@ -239,6 +239,39 @@ body{ background:linear-gradient(180deg,#0E2417 0%,#0B1E13 100%); }
 .s.on .dadd{ pointer-events:auto; }
 .dadd:hover{ background:var(--primario); color:#0E2417; }
 
+/* === Conteo total en header del intercambio === */
+.xc-tot-badge{display:inline-block;font-size:12px;font-weight:700;background:rgba(255,138,30,.2);color:var(--repe);
+  border-radius:20px;padding:2px 10px;margin-left:6px;vertical-align:middle;}
+.xc-tot-0{background:rgba(255,255,255,.08);color:var(--texto-tenue);}
+.xc-mini-tot{font-size:12px;color:var(--texto-tenue);padding:6px 10px;margin-bottom:8px;
+  background:rgba(255,255,255,.04);border-radius:8px;border:1px solid var(--borde);}
+.xc-mini-tot b{color:var(--texto);}
+
+/* === Botón QR en el modal de intercambio === */
+.xc-qr-btn{width:100%;margin-top:10px;padding:12px 16px;
+  background:rgba(201,162,75,.10);color:var(--primario);
+  border:1px solid rgba(201,162,75,.35);border-radius:12px;
+  font-size:14px;font-weight:700;cursor:pointer;text-align:center;display:block;
+  transition:background .15s;}
+.xc-qr-btn:active{ background:rgba(201,162,75,.22); }
+
+/* === Overlay QR (pantalla completa sobre el modal) === */
+.xc-qr-ov{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:500;
+  display:none;align-items:center;justify-content:center;padding:20px;}
+.xc-qr-ov.open{display:flex;}
+.xc-qr-box{background:var(--superficie);border:1px solid rgba(201,162,75,.3);
+  border-radius:20px;padding:20px;max-width:340px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.6);}
+.xc-qr-hd{display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:10px;font-weight:800;color:var(--primario);font-size:16px;}
+.xc-qr-hint{font-size:13px;color:var(--texto-tenue);margin-bottom:14px;line-height:1.5;}
+.xc-qr-wrap{background:#fff;border-radius:12px;padding:10px;margin-bottom:12px;text-align:center;}
+.xc-qr-img{width:220px;height:220px;display:block;margin:auto;}
+.xc-qr-noimg{color:#999;font-size:13px;text-align:center;padding:40px 0;}
+.xc-qr-url{font-size:11px;color:var(--texto-mute);word-break:break-all;
+  background:var(--superficie-2);border:1px solid var(--borde);border-radius:8px;
+  padding:8px 10px;margin-bottom:12px;cursor:pointer;font-family:monospace;line-height:1.6;}
+.xc-qr-url:active{opacity:.7;}
+
 /* Faltantes (texto) */
 .miss{ background:rgba(225,37,27,.08); border-color:rgba(225,37,27,.2); }
 .miss-t{ color:var(--acento); }
@@ -1533,44 +1566,49 @@ function compartirAcuerdoWhatsApp(res){
 }
 
 /* --- UI dentro del modal genérico --- */
-const HTML_INTERCAMBIO=`<div class="xc">
-  <section class="xc-step">
-    <div class="xc-step-num">1</div>
-    <div class="xc-step-body">
-      <h4>Comparte tus repetidas</h4>
-      <p class="xc-hint">Manda tu lista a un amigo por WhatsApp. Para un cambio completo, incluye también lo que te falta.</p>
-      <label class="xc-check"><input type="checkbox" id="xcFaltanToggle" checked>
-        <span>Incluir lo que me falta (recomendado)</span></label>
-      <div class="xc-actions">
-        <button class="xc-btn xc-wa" onclick="enviarRepetidasWhatsApp()"><span class="xc-ico">📲</span> Enviar por WhatsApp</button>
-        <button class="xc-btn xc-ghost" onclick="copiarReporteRepetidas(this)">📋 Copiar</button>
-      </div>
-      <div class="xc-mini">
-        <button class="xc-link" onclick="toggleMini('miniRep','repes')">🔁 ver mis repetidas</button>
-        <button class="xc-link" onclick="toggleMini('miniFal','faltan')">🔻 ver lo que me falta</button>
-      </div>
-      <div id="miniRep" class="xc-mini-body" style="display:none"></div>
-      <div id="miniFal" class="xc-mini-body" style="display:none"></div>
-    </div>
-  </section>
-  <div class="xc-sep"></div>
-  <section class="xc-step">
-    <div class="xc-step-num">2</div>
-    <div class="xc-step-body">
-      <h4>Pega la lista de tu amigo</h4>
-      <p class="xc-hint">Copia el mensaje que te mandó y pégalo aquí. La app encuentra qué te conviene cambiar.</p>
-      <textarea id="xcPega" class="xc-ta" rows="6" placeholder="♻️ REPETIDAS para cambio (12)&#10;MEX 🇲🇽: 3, 8&#10;FRA 🇫🇷: 1, 5, 15"></textarea>
-      <div class="xc-actions">
-        <button class="xc-btn xc-go" onclick="procesarReporteAmigo()">🔎 Buscar cambios</button>
-      </div>
-    </div>
-  </section>
-  <div id="xcResultado" class="xc-res" style="display:none"></div>
-</div>`;
+function _htmlIntercambio(){
+  var totR=0, teamsR=new Set(), totF=0;
+  for(var _xc in dupes){ if(dupes[_xc]>0){ totR+=dupes[_xc]; var _xt=findTid(_xc); if(_xt)teamsR.add(_xt); } }
+  allSt().forEach(function(o){ if(!owned[o.c]) totF++; });
+  var badgeR=totR?('<span class="xc-tot-badge">'+totR+' en '+teamsR.size+' equipos</span>'):'<span class="xc-tot-badge xc-tot-0">ninguna aún</span>';
+  return '<div class="xc">'+
+    '<section class="xc-step"><div class="xc-step-num">1</div><div class="xc-step-body">'+
+    '<h4>Tus repetidas '+badgeR+'</h4>'+
+    '<p class="xc-hint">Comparte con un amigo para ver qué cambiar. Incluye tus faltantes para un cruce completo.</p>'+
+    '<label class="xc-check"><input type="checkbox" id="xcFaltanToggle" checked>'+
+    '<span>Incluir mis faltantes ('+totF+')</span></label>'+
+    '<div class="xc-actions">'+
+    '<button class="xc-btn xc-wa" onclick="enviarRepetidasWhatsApp()"><span class="xc-ico">📲</span> WhatsApp</button>'+
+    '<button class="xc-btn xc-ghost" onclick="copiarReporteRepetidas(this)">📋 Copiar texto</button>'+
+    '</div>'+
+    '<button class="xc-qr-btn" onclick="mostrarQR()">📱 Generar QR — el amigo escanea y la app carga sola</button>'+
+    '<div class="xc-mini">'+
+    '<button class="xc-link" onclick="toggleMini(\'miniRep\',\'repes\')">🔁 ver mis repetidas</button>'+
+    '<button class="xc-link" onclick="toggleMini(\'miniFal\',\'faltan\')">🔻 ver mis faltantes</button>'+
+    '</div>'+
+    '<div id="miniRep" class="xc-mini-body" style="display:none"></div>'+
+    '<div id="miniFal" class="xc-mini-body" style="display:none"></div>'+
+    '</div></section>'+
+    '<div class="xc-sep"></div>'+
+    '<section class="xc-step"><div class="xc-step-num">2</div><div class="xc-step-body">'+
+    '<h4>Lista de tu amigo</h4>'+
+    '<p class="xc-hint">Pega el mensaje que te mandó, o comparte tu QR para que la app lo cargue sola.</p>'+
+    '<textarea id="xcPega" class="xc-ta" rows="6" placeholder="&#x267B;&#xFE0F; REPETIDAS para cambio (12)&#10;MEX &#x1F1F2;&#x1F1FD;: 3, 8&#10;FRA &#x1F1EB;&#x1F1F7;: 1, 5, 15"></textarea>'+
+    '<div class="xc-actions">'+
+    '<button class="xc-btn xc-go" onclick="procesarReporteAmigo()">&#x1F50E; Buscar cambios</button>'+
+    '</div></div></section>'+
+    '<div id="xcResultado" class="xc-res" style="display:none"></div>'+
+    '</div>';
+}
 function abrirIntercambio(){
-  document.getElementById('modalTitle').textContent='🤝 Intercambio por WhatsApp';
-  document.getElementById('modalBody').innerHTML=HTML_INTERCAMBIO;
+  document.getElementById('modalTitle').textContent='🤝 Intercambio';
+  document.getElementById('modalBody').innerHTML=_htmlIntercambio();
   document.getElementById('modal').classList.add('open');
+  if(window._pendingFriendQR){
+    var ta=document.getElementById('xcPega');
+    if(ta){ ta.value=window._pendingFriendQR; setTimeout(procesarReporteAmigo,300); }
+    window._pendingFriendQR=null;
+  }
 }
 function procesarReporteAmigo(){
   const ta=document.getElementById('xcPega'); const txt=ta?ta.value:'';
@@ -1642,7 +1680,9 @@ function _miniLista(modo){
   }
   var ao=_albumOrd(); var tids=Object.keys(byTid).sort(function(a,b){ return(ao[a]||999)-(ao[b]||999); });
   if(!tids.length) return '<p class="xc-empty">'+(modo==='faltan'?'¡No te falta ninguna! 🎉':'Aún no marcas repetidas.')+'</p>';
-  return tids.map(function(tid){ var m=tidMeta(tid); var nums=Array.from(new Set(byTid[tid])).sort(function(a,b){return a-b;});
+  var total=tids.reduce(function(s,t){ return s+byTid[t].length; },0);
+  var header='<div class="xc-mini-tot"><b>'+total+'</b> '+(modo==='repes'?'repetidas':'faltantes')+' · <b>'+tids.length+'</b> selecciones</div>';
+  return header+tids.map(function(tid){ var m=tidMeta(tid); var nums=Array.from(new Set(byTid[tid])).sort(function(a,b){return a-b;});
     return '<div class="res-sel"><div class="res-h">'+(m.flag||'')+' '+m.name+'<span class="res-cnt">'+nums.length+'</span></div><div class="res-nums">'+comprimirRangos(nums)+'</div></div>';
   }).join('');
 }
@@ -1700,6 +1740,105 @@ function irA(id){
 }
 // Pintar casi-listas al cargar (updateStats lo refresca en cada cambio)
 try{ renderCasiListas(); }catch(e){}
+
+/* ===================================================================
+   6) INTERCAMBIO POR QR
+   Codec compacto: R:TID:n1,n2x2;TID2:n3|F:TID:n4,n5
+   El amigo escanea el QR con la cámara, la app se abre con los datos
+   pre-cargados y calcula el cruce automáticamente — sin copiar texto.
+   =================================================================== */
+
+function _qrEncode(){
+  var ao=_albumOrd();
+  function encMap(map){
+    return Object.entries(map)
+      .sort(function(a,b){ return(ao[a[0]]||999)-(ao[b[0]]||999); })
+      .filter(function(e){ return e[1].length; })
+      .map(function(e){ return e[0]+':'+e[1].join(','); }).join(';');
+  }
+  var r={}, f={};
+  for(var code in dupes){
+    if(!(dupes[code]>0)) continue;
+    var tid=findTid(code); if(!tid) continue;
+    var num=numFromCode(code); if(num==null) continue;
+    var cnt=dupes[code];
+    (r[tid]=r[tid]||[]).push(cnt>1?num+'x'+cnt:''+num);
+  }
+  allSt().forEach(function(o){
+    if(!owned[o.c]){ var n=numFromCode(o.c); if(n!=null)(f[o.tid]=f[o.tid]||[]).push(''+n); }
+  });
+  return 'R:'+encMap(r)+'|F:'+encMap(f);
+}
+
+function _qrDecode(compact){
+  var parts=compact.split('|');
+  var rPart=(parts.filter(function(p){return p.startsWith('R:');})[0]||'').slice(2);
+  var fPart=(parts.filter(function(p){return p.startsWith('F:');})[0]||'').slice(2);
+  var rLines='',fLines='',totR=0,totF=0;
+  if(rPart) rPart.split(';').filter(Boolean).forEach(function(item){
+    var ci=item.indexOf(':'); if(ci<0) return;
+    var tid=item.slice(0,ci).toUpperCase(), nums=item.slice(ci+1);
+    var cnt=(nums.match(/\d+(?:x\d+)?/g)||[]).reduce(function(s,t){
+      var mx=t.match(/x(\d+)/); return s+(mx?parseInt(mx[1]):1); },0);
+    totR+=cnt; rLines+=tid+': '+nums.replace(/x/g,'×')+'\n';
+  });
+  if(fPart) fPart.split(';').filter(Boolean).forEach(function(item){
+    var ci=item.indexOf(':'); if(ci<0) return;
+    var tid=item.slice(0,ci).toUpperCase(), nums=item.slice(ci+1);
+    totF+=(nums.match(/\d+/g)||[]).length; fLines+=tid+': '+nums+'\n';
+  });
+  var out='';
+  if(rLines) out+='♻️ REPETIDAS para cambio ('+totR+')\n'+rLines;
+  if(fLines) out+='\n🔲 ME FALTAN ('+totF+')\n'+fLines;
+  return out.trim();
+}
+
+function generarUrlQR(){
+  var compact=_qrEncode();
+  var b64=btoa(unescape(encodeURIComponent(compact)))
+    .replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+  return location.href.split('?')[0]+'?r='+b64;
+}
+
+function mostrarQR(){
+  var url=generarUrlQR();
+  window._xcQrUrl=url;
+  var imgSrc='https://api.qrserver.com/v1/create-qr-code/?data='+encodeURIComponent(url)+'&size=240x240&margin=4&ecc=M';
+  var el=document.getElementById('xcQR');
+  if(!el){ el=document.createElement('div'); el.id='xcQR'; document.body.appendChild(el); }
+  el.className='xc-qr-ov open';
+  el.innerHTML=
+    '<div class="xc-qr-box">'+
+    '<div class="xc-qr-hd"><span>Código QR · Intercambio</span>'+
+    '<button class="sb-x" onclick="cerrarQR()">✕</button></div>'+
+    '<p class="xc-qr-hint">Tu amigo escanea esto con la cámara del teléfono. La app se abre con los datos ya cargados — sin copiar ni pegar nada.</p>'+
+    '<div class="xc-qr-wrap">'+
+    '<img src="'+imgSrc+'" class="xc-qr-img" alt="QR"'+
+    ' onerror="this.outerHTML=\'<p class=xc-qr-noimg>Sin conexión — comparte el enlace directamente.</p>\'">'+
+    '</div>'+
+    '<div class="xc-qr-url" onclick="copyText(window._xcQrUrl,this)" title="Toca para copiar">'+url+'</div>'+
+    '<div class="xc-actions">'+
+    '<button class="xc-btn xc-wa" onclick="compartirWhatsApp(window._xcQrUrl)"><span class="xc-ico">📲</span> Compartir</button>'+
+    '<button class="xc-btn xc-ghost" onclick="copyText(window._xcQrUrl,this)">📋 Copiar enlace</button>'+
+    '</div></div>';
+}
+function cerrarQR(){ var el=document.getElementById('xcQR'); if(el) el.classList.remove('open'); }
+
+/* Detectar ?r= en URL (QR escaneado por el amigo) */
+(function(){
+  try{
+    var raw=new URLSearchParams(location.search).get('r');
+    if(!raw) return;
+    var compact=decodeURIComponent(escape(atob(raw.replace(/-/g,'+').replace(/_/g,'/'))));
+    window._pendingFriendQR=_qrDecode(compact);
+    if(history.replaceState) history.replaceState(null,'',location.pathname);
+    // Auto-abrir modal de intercambio con los datos del amigo ya cargados
+    setTimeout(function(){
+      toast('📱 Lista del amigo cargada — calculando cambios...');
+      setTimeout(function(){ if(typeof abrirIntercambio==='function') abrirIntercambio(); },800);
+    },600);
+  }catch(e){}
+})();
 
 </script>
 </body>
