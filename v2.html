@@ -274,6 +274,13 @@ body{ background:linear-gradient(180deg,#0E2417 0%,#0B1E13 100%); }
   background:var(--superficie-2);border:1px solid var(--borde);border-radius:8px;
   padding:8px 10px;margin-bottom:12px;cursor:pointer;font-family:monospace;line-height:1.6;}
 .xc-qr-url:active{opacity:.7;}
+/* Botón principal: compartir imagen */
+.xc-qr-share-img{width:100%;margin:12px 0 8px;font-size:15px;padding:14px;}
+/* Fila secundaria: enlace WA + copiar */
+.xc-qr-sub{display:flex;gap:8px;margin-top:0;}
+.xc-qr-link{flex:1;background:transparent;border:1px solid var(--borde);color:var(--texto-tenue);
+  border-radius:10px;padding:9px 8px;font-size:13px;font-weight:600;cursor:pointer;text-align:center;}
+.xc-qr-link:active{opacity:.7;}
 
 /* Faltantes (texto) */
 .miss{ background:rgba(225,37,27,.08); border-color:rgba(225,37,27,.2); }
@@ -1806,7 +1813,8 @@ function generarUrlQR(){
 function mostrarQR(){
   var url=generarUrlQR();
   window._xcQrUrl=url;
-  var imgSrc='https://api.qrserver.com/v1/create-qr-code/?data='+encodeURIComponent(url)+'&size=240x240&margin=4&ecc=M';
+  window._xcQrImgSrc='https://api.qrserver.com/v1/create-qr-code/?data='+encodeURIComponent(url)+'&size=400x400&margin=6&ecc=M';
+  var previewSrc='https://api.qrserver.com/v1/create-qr-code/?data='+encodeURIComponent(url)+'&size=240x240&margin=4&ecc=M';
   var el=document.getElementById('xcQR');
   if(!el){ el=document.createElement('div'); el.id='xcQR'; document.body.appendChild(el); }
   el.className='xc-qr-ov open';
@@ -1816,16 +1824,44 @@ function mostrarQR(){
     '<button class="sb-x" onclick="cerrarQR()">✕</button></div>'+
     '<p class="xc-qr-hint">Tu amigo escanea esto con la cámara del teléfono. La app se abre con los datos ya cargados — sin copiar ni pegar nada.</p>'+
     '<div class="xc-qr-wrap">'+
-    '<img src="'+imgSrc+'" class="xc-qr-img" alt="QR"'+
+    '<img src="'+previewSrc+'" class="xc-qr-img" alt="QR"'+
     ' onerror="this.outerHTML=\'<p class=xc-qr-noimg>Sin conexión — comparte el enlace directamente.</p>\'">'+
     '</div>'+
-    '<div class="xc-qr-url" onclick="copyText(window._xcQrUrl,this)" title="Toca para copiar">'+url+'</div>'+
-    '<div class="xc-actions">'+
-    '<button class="xc-btn xc-wa" onclick="compartirWhatsApp(window._xcQrUrl)"><span class="xc-ico">📲</span> Compartir</button>'+
-    '<button class="xc-btn xc-ghost" onclick="copyText(window._xcQrUrl,this)">📋 Copiar enlace</button>'+
-    '</div></div>';
+    '<button class="xc-btn xc-wa xc-qr-share-img" onclick="compartirQRImagen(this)">'+
+    '<span class="xc-ico">📷</span> Enviar imagen QR por WhatsApp</button>'+
+    '<div class="xc-qr-sub">'+
+    '<button class="xc-qr-link" onclick="compartirWhatsApp(window._xcQrUrl)">📲 Compartir enlace</button>'+
+    '<button class="xc-qr-link" onclick="copyText(window._xcQrUrl,this)">📋 Copiar enlace</button>'+
+    '</div>'+
+    '</div>';
 }
 function cerrarQR(){ var el=document.getElementById('xcQR'); if(el) el.classList.remove('open'); }
+
+async function compartirQRImagen(btn){
+  var url=window._xcQrUrl, imgSrc=window._xcQrImgSrc;
+  if(!url){ toast('Genera primero el QR',true); return; }
+  if(btn){ btn.disabled=true; btn.textContent='⏳ Preparando...'; }
+  try{
+    var blob=await fetch(imgSrc).then(function(r){ return r.blob(); });
+    var file=new File([blob],'qr-panini.png',{type:'image/png'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){
+      await navigator.share({
+        files:[file],
+        title:'QR Intercambio Panini 2026',
+        text:'Escanea para ver qué estampas podemos cambiar 🤝\n'+url
+      });
+    } else if(navigator.share){
+      await navigator.share({url:url,title:'Intercambio Panini 2026',text:'Escanea el QR para ver qué cambiamos 🤝'});
+    } else {
+      var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='qr-panini.png'; a.click();
+      toast('Imagen guardada — compártela por WhatsApp');
+    }
+  }catch(e){
+    if(e.name!=='AbortError') compartirWhatsApp(url);
+  } finally{
+    if(btn){ btn.disabled=false; btn.innerHTML='<span class="xc-ico">📷</span> Enviar imagen QR por WhatsApp'; }
+  }
+}
 
 /* Detectar ?r= en URL (QR escaneado por el amigo) */
 (function(){
