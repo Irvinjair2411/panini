@@ -414,6 +414,8 @@ body{ background:linear-gradient(180deg,#0E2417 0%,#0B1E13 100%); }
 .xc-col-h.pid{ color:var(--exito); border-color:rgba(141,198,63,.3); }
 .xc-col-h.ofr{ color:var(--primario); border-color:rgba(201,162,75,.3); }
 .xc-empty{ font-size:13px; color:var(--texto-mute); font-style:italic; margin:0 0 8px; }
+.xc-amigo-meta{ font-size:12px; color:var(--texto-tenue); margin:0 0 10px; padding:5px 10px; background:var(--superficie-2); border-radius:8px; }
+.xc-amigo-meta b{ color:var(--texto); }
 .xc-flow{ display:flex; flex-wrap:wrap; gap:4px 6px; padding:4px 0 8px; }
 .xc-fi{ font-size:12px; line-height:1.5; background:var(--superficie-2); border:1px solid var(--borde);
   border-radius:6px; padding:2px 8px; white-space:nowrap; }
@@ -1684,6 +1686,7 @@ function _htmlIntercambio(){
     '</div>';
 }
 function _qrDataToReporte(pd){
+  window.__friendMeta={total:Object.keys(pd.owned).length,dupes:Object.keys(pd.dupes).length};
   var repes={},faltan={};
   Object.keys(pd.dupes||{}).forEach(function(code){
     var m=String(code).match(/^([A-Za-z]+)(\d+)$/); if(!m) return;
@@ -1732,6 +1735,11 @@ function renderResultadoCruce(res){
   let html=`<div class="xc-tots"><div class="xc-tot pid"><b>${res.totPidele}</b><span>PÍDELE</span></div>`+
     `<div class="xc-tot ofr"><b>${res.totOfrecele}</b><span>OFRÉCELE</span></div>`+
     `<div class="xc-modo">${res.modo==='completo'?'Modo completo':'Modo simple'}</div></div>`;
+  if(window.__friendMeta){
+    const fm=window.__friendMeta;
+    html+=`<p class="xc-amigo-meta">📖 Álbum del amigo: <b>${fm.total}</b> estampillas · <b>${fm.dupes}</b> repetidas</p>`;
+    window.__friendMeta=null;
+  }
   html+=`<div class="xc-col">${colHTML('📥 PÍDELE','pid',res.pidele,'Nada por pedir.')}</div>`;
   if(res.modo==='completo'){
     html+=`<div class="xc-col">${colHTML('📤 OFRÉCELE','ofr',res.ofrecele,'No tienes repes que le falten.')}</div>`;
