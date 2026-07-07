@@ -409,17 +409,16 @@ body{ background:linear-gradient(180deg,#0E2417 0%,#0B1E13 100%); }
 .xc-tot.ofr{ border-color:rgba(201,162,75,.4); }
 .xc-tot.ofr b{ color:var(--primario); }
 .xc-modo{ flex:0 0 auto; font-size:11px; color:var(--texto-tenue); background:var(--fondo); padding:5px 10px; border-radius:20px; border:1px solid var(--borde); }
-.xc-col{ margin-bottom:16px; }
-.xc-col-h{ margin:0 0 10px; font-family:'Bebas Neue',sans-serif; letter-spacing:.5px; font-size:18px; padding-bottom:6px; border-bottom:2px solid; }
+.xc-col{ margin-bottom:12px; }
+.xc-col-h{ margin:0 0 6px; font-family:'Bebas Neue',sans-serif; letter-spacing:.5px; font-size:16px; padding-bottom:4px; border-bottom:2px solid; }
 .xc-col-h.pid{ color:var(--exito); border-color:rgba(141,198,63,.3); }
 .xc-col-h.ofr{ color:var(--primario); border-color:rgba(201,162,75,.3); }
 .xc-empty{ font-size:13px; color:var(--texto-mute); font-style:italic; margin:0 0 8px; }
-.xc-sel{ background:var(--superficie-2); border:1px solid var(--borde); border-radius:10px; padding:10px 12px; margin-bottom:8px; }
-.xc-sel-h{ display:flex; align-items:center; gap:6px; font-weight:800; font-size:15px; color:var(--texto); margin-bottom:8px; }
-.xc-cnt{ margin-left:auto; background:var(--fondo); color:var(--texto-tenue); font-size:12px; padding:2px 9px; border-radius:20px; min-width:20px; text-align:center; }
-.xc-chips{ display:flex; flex-wrap:wrap; gap:6px; }
-.xc-chips .chip{ background:var(--fondo); border:1px solid var(--borde); color:var(--texto);
-  font-family:'Bebas Neue',sans-serif; font-size:16px; letter-spacing:.5px; min-width:30px; padding:3px 9px; border-radius:8px; text-align:center; }
+.xc-flow{ display:flex; flex-wrap:wrap; gap:4px 6px; padding:4px 0 8px; }
+.xc-fi{ font-size:12px; line-height:1.5; background:var(--superficie-2); border:1px solid var(--borde);
+  border-radius:6px; padding:2px 8px; white-space:nowrap; }
+.xc-fi-tid{ font-weight:800; font-size:12px; }
+.xc-fi-nums{ color:var(--texto-tenue); font-size:11px; }
 @media (max-width:380px){ .xc-tots{ gap:6px; } .xc-tot b{ font-size:26px; } .xc-step-body h4{ font-size:18px; } }
 
 /* ===================== BOTONES COMPACTOS (barra de controles) ===================== */
@@ -1721,18 +1720,21 @@ function procesarReporteAmigo(){
 function renderResultadoCruce(res){
   const box=document.getElementById('xcResultado'); window.__xcRes=res;
   const colHTML=(titulo,cls,arr,vacio)=>{
-    if(!arr.length) return `<h5 class="xc-col-h ${cls}">${titulo}</h5><p class="xc-empty">${vacio}</p>`;
-    let h=`<h5 class="xc-col-h ${cls}">${titulo}</h5>`;
-    arr.forEach(sec=>{ h+=`<div class="xc-sel"><div class="xc-sel-h">${sec.tid} ${sec.flag||''}<span class="xc-cnt">${sec.items.length}</span></div>`+
-      `<div class="xc-chips">${sec.items.map(i=>`<span class="chip" title="${i.code}">${i.num}</span>`).join('')}</div></div>`; });
-    return h;
+    const tot=arr.reduce((s,a)=>s+a.items.length,0);
+    const hdr=`<h5 class="xc-col-h ${cls}">${titulo} <span style="font-size:13px;font-family:inherit;font-weight:400">(${tot})</span></h5>`;
+    if(!arr.length) return hdr+`<p class="xc-empty">${vacio}</p>`;
+    let chips=arr.map(sec=>{
+      const nums=sec.items.map(i=>i.num).join(', ');
+      return `<span class="xc-fi"><span class="xc-fi-tid">${sec.flag||''} ${sec.tid}</span> <span class="xc-fi-nums">${nums}</span></span>`;
+    }).join('');
+    return hdr+`<div class="xc-flow">${chips}</div>`;
   };
   let html=`<div class="xc-tots"><div class="xc-tot pid"><b>${res.totPidele}</b><span>PÍDELE</span></div>`+
     `<div class="xc-tot ofr"><b>${res.totOfrecele}</b><span>OFRÉCELE</span></div>`+
     `<div class="xc-modo">${res.modo==='completo'?'Modo completo':'Modo simple'}</div></div>`;
-  html+=`<div class="xc-col">${colHTML('📥 PÍDELE — sus repes que te faltan','pid',res.pidele,'Nada por pedir de su lista.')}</div>`;
+  html+=`<div class="xc-col">${colHTML('📥 PÍDELE','pid',res.pidele,'Nada por pedir.')}</div>`;
   if(res.modo==='completo'){
-    html+=`<div class="xc-col">${colHTML('📤 OFRÉCELE — tus repes que le faltan','ofr',res.ofrecele,'No tienes repes que a él le falten.')}</div>`;
+    html+=`<div class="xc-col">${colHTML('📤 OFRÉCELE','ofr',res.ofrecele,'No tienes repes que le falten.')}</div>`;
   } else {
     html+=`<div class="xc-col"><p class="xc-empty">Para ver qué OFRECERLE, pídele que incluya su bloque <b>🔲 ME FALTAN</b> en el mensaje.</p></div>`;
   }
