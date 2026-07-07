@@ -282,6 +282,41 @@ body{ background:linear-gradient(180deg,#0E2417 0%,#0B1E13 100%); }
   border-radius:10px;padding:9px 8px;font-size:13px;font-weight:600;cursor:pointer;text-align:center;}
 .xc-qr-link:active{opacity:.7;}
 
+/* Botón escanear QR en sección 2 del intercambio */
+.xc-scan-btn{width:100%;padding:14px;margin-bottom:8px;
+  background:rgba(201,162,75,.12);color:var(--primario);
+  border:1.5px solid rgba(201,162,75,.45);border-radius:12px;
+  font-size:15px;font-weight:800;cursor:pointer;text-align:center;display:block;}
+.xc-scan-btn:active{opacity:.7;}
+.xc-hint-o{text-align:center;font-size:12px;color:var(--texto-tenue);
+  margin:4px 0 8px;letter-spacing:.02em;}
+
+/* === Overlay escáner QR === */
+.xc-scan-ov{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:10001;
+  display:none;align-items:center;justify-content:center;padding:20px;}
+.xc-scan-ov.open{display:flex;}
+.xc-scan-box{background:var(--superficie);border:1px solid rgba(201,162,75,.3);
+  border-radius:20px;padding:20px;max-width:340px;width:100%;
+  box-shadow:0 8px 40px rgba(0,0,0,.7);}
+.xc-scan-hdr{display:flex;justify-content:space-between;align-items:center;
+  font-weight:800;font-size:15px;color:var(--primario);margin-bottom:14px;}
+.xc-scan-hdr button{background:none;border:none;color:var(--texto-tenue);
+  font-size:22px;cursor:pointer;line-height:1;padding:0 4px;}
+.xc-scan-frame{position:relative;width:100%;aspect-ratio:1;border-radius:14px;
+  overflow:hidden;background:#000;margin-bottom:12px;}
+.xc-scan-frame video{width:100%;height:100%;object-fit:cover;display:block;}
+/* Marco de mira con esquinas doradas */
+.xc-scan-aim{position:absolute;inset:18%;pointer-events:none;}
+.xc-scan-aim::before,.xc-scan-aim::after,
+.xc-scan-aim>span::before,.xc-scan-aim>span::after{
+  content:'';position:absolute;width:22px;height:22px;
+  border-color:rgba(201,162,75,.9);border-style:solid;}
+.xc-scan-aim::before{top:0;left:0;border-width:3px 0 0 3px;border-radius:4px 0 0 0;}
+.xc-scan-aim::after{top:0;right:0;border-width:3px 3px 0 0;border-radius:0 4px 0 0;}
+.xc-scan-aim>span::before{bottom:0;left:0;border-width:0 0 3px 3px;border-radius:0 0 0 4px;}
+.xc-scan-aim>span::after{bottom:0;right:0;border-width:0 3px 3px 0;border-radius:0 0 4px 0;}
+.xc-scan-tip{text-align:center;font-size:13px;color:var(--texto-tenue);margin:0 0 10px;}
+
 /* Faltantes (texto) */
 .miss{ background:rgba(225,37,27,.08); border-color:rgba(225,37,27,.2); }
 .miss-t{ color:var(--acento); }
@@ -1630,8 +1665,9 @@ function _htmlIntercambio(){
     '<div class="xc-sep"></div>'+
     '<section class="xc-step"><div class="xc-step-num">2</div><div class="xc-step-body">'+
     '<h4>Lista de tu amigo</h4>'+
-    '<p class="xc-hint">Pega el mensaje que te mandó, o comparte tu QR para que la app lo cargue sola.</p>'+
-    '<textarea id="xcPega" class="xc-ta" rows="6" placeholder="&#x267B;&#xFE0F; REPETIDAS para cambio (12)&#10;MEX &#x1F1F2;&#x1F1FD;: 3, 8&#10;FRA &#x1F1EB;&#x1F1F7;: 1, 5, 15"></textarea>'+
+    '<button class="xc-scan-btn" onclick="abrirEscaner()">📷 Escanear QR del amigo</button>'+
+    '<p class="xc-hint xc-hint-o">— o pega el mensaje que te mandó —</p>'+
+    '<textarea id="xcPega" class="xc-ta" rows="5" placeholder="&#x267B;&#xFE0F; REPETIDAS para cambio (12)&#10;MEX &#x1F1F2;&#x1F1FD;: 3, 8&#10;FRA &#x1F1EB;&#x1F1F7;: 1, 5, 15"></textarea>'+
     '<div class="xc-actions">'+
     '<button class="xc-btn xc-go" onclick="procesarReporteAmigo()">&#x1F50E; Buscar cambios</button>'+
     '</div></div></section>'+
@@ -1864,6 +1900,85 @@ function mostrarQR(){
     '</div>';
 }
 function cerrarQR(){ var el=document.getElementById('xcQR'); if(el) el.classList.remove('open'); }
+
+/* ---------- ESCÁNER QR (leer QR del amigo) ---------- */
+var _scanStream=null, _scanTimer=null;
+
+function abrirEscaner(){
+  var ov=document.getElementById('xcScan');
+  if(!ov){
+    ov=document.createElement('div'); ov.id='xcScan'; ov.className='xc-scan-ov';
+    ov.innerHTML=
+      '<div class="xc-scan-box">'+
+      '<div class="xc-scan-hdr"><span>📷 Escanear QR del amigo</span>'+
+      '<button onclick="cerrarEscaner()">✕</button></div>'+
+      '<div class="xc-scan-frame"><video id="xcScanVid" playsinline autoplay muted></video>'+
+      '<div class="xc-scan-aim"><span></span></div></div>'+
+      '<p class="xc-scan-tip">Apunta la cámara al QR del amigo</p>'+
+      '<button class="xc-qr-link" style="margin-top:4px" onclick="_escanearFoto()">📁 Elegir imagen de la galería</button>'+
+      '</div>';
+    document.body.appendChild(ov);
+  }
+  ov.classList.add('open');
+  if(!('BarcodeDetector' in window)){
+    var frame=ov.querySelector('.xc-scan-frame'); if(frame) frame.style.display='none';
+    var tip=ov.querySelector('.xc-scan-tip'); if(tip) tip.textContent='Tu navegador no soporta cámara — usa "Elegir imagen"';
+    return;
+  }
+  navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false})
+    .then(function(stream){
+      _scanStream=stream;
+      var vid=document.getElementById('xcScanVid');
+      vid.srcObject=stream;
+      var det=new BarcodeDetector({formats:['qr_code']});
+      _scanTimer=setInterval(function(){
+        if(!vid.readyState||vid.readyState<2) return;
+        det.detect(vid).then(function(codes){
+          if(codes.length) _onQrDetected(codes[0].rawValue);
+        }).catch(function(){});
+      },300);
+    })
+    .catch(function(){
+      var tip=document.querySelector('#xcScan .xc-scan-tip');
+      if(tip) tip.textContent='Sin acceso a la cámara — usa "Elegir imagen"';
+    });
+}
+
+function cerrarEscaner(){
+  var ov=document.getElementById('xcScan'); if(ov) ov.classList.remove('open');
+  if(_scanTimer){ clearInterval(_scanTimer); _scanTimer=null; }
+  if(_scanStream){ _scanStream.getTracks().forEach(function(t){ t.stop(); }); _scanStream=null; }
+}
+
+function _escanearFoto(){
+  var inp=document.createElement('input');
+  inp.type='file'; inp.accept='image/*';
+  inp.onchange=function(){
+    var file=inp.files[0]; if(!file) return;
+    if(!('BarcodeDetector' in window)){ toast('Tu navegador no soporta lectura de QR — pega el enlace',true); return; }
+    createImageBitmap(file).then(function(img){
+      var det=new BarcodeDetector({formats:['qr_code']});
+      return det.detect(img);
+    }).then(function(codes){
+      if(!codes.length){ toast('No se detectó QR en la imagen',true); return; }
+      _onQrDetected(codes[0].rawValue);
+    }).catch(function(){ toast('Error al leer la imagen',true); });
+  };
+  inp.click();
+}
+
+function _onQrDetected(raw){
+  cerrarEscaner();
+  try{
+    var m=raw.match(/[?&]r=([^&\s]+)/);
+    if(!m){ toast('QR no reconocido — ¿es de esta app?',true); return; }
+    var compact=decodeURIComponent(escape(atob(m[1].replace(/-/g,'+').replace(/_/g,'/'))));
+    window._pendingFriendQR=_qrDecode(compact);
+    if(navigator.vibrate) navigator.vibrate(40);
+    toast('✅ QR leído — calculando cambios...');
+    setTimeout(abrirIntercambio,600);
+  }catch(e){ toast('Error al decodificar QR',true); }
+}
 
 async function compartirQRImagen(btn){
   var url=window._xcQrUrl, imgSrc=window._xcQrImgSrc;
