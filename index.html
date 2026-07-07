@@ -1967,8 +1967,63 @@ function _escanearFoto(){
   inp.click();
 }
 
+var _FIG_INTRO=['00','FWC1','FWC2','FWC3','FWC4','FWC5','FWC6','FWC7','FWC8',
+  'FWC9','FWC10','FWC11','FWC12','FWC13','FWC14','FWC15','FWC16','FWC17','FWC18','FWC19'];
+var _FIG_TEAMS=['MEX','RSA','KOR','CZE','CAN','BIH','QAT','SUI','BRA','MAR',
+  'HAI','SCO','USA','PAR','AUS','TUR','GER','CUW','CIV','ECU','NED','JPN','SWE','TUN',
+  'BEL','EGY','IRN','NZL','ESP','CPV','KSA','URU','FRA','SEN','IRQ','NOR',
+  'ARG','ALG','AUT','JOR','POR','COD','UZB','COL','ENG','CRO','GHA','PAN'];
+var _FIG_CC=['CC1','CC2','CC3','CC4'];
+
+function _figuritasBitToCode(i){
+  if(i<20) return _FIG_INTRO[i]||null;
+  if(i<980){
+    var t=Math.floor((i-20)/20),s=((i-20)%20)+1;
+    var tid=_FIG_TEAMS[t]; return tid?tid+s:null;
+  }
+  if(i<984) return _FIG_CC[i-980]||null;
+  return null;
+}
+
+async function _parseFiguritasQR(raw){
+  var m=raw.match(/⋋~([^;\s]+);([^;\s]+)/);
+  if(!m) throw new Error('formato no reconocido');
+  async function decomp(b64){
+    var bin=atob(b64.replace(/-/g,'+').replace(/_/g,'/'));
+    var inp=new Uint8Array(bin.length);
+    for(var j=0;j<bin.length;j++) inp[j]=bin.charCodeAt(j);
+    var ds=new DecompressionStream('gzip');
+    var w=ds.writable.getWriter(),r=ds.readable.getReader();
+    w.write(inp); w.close();
+    var chunks=[],total=0;
+    for(;;){ var x=await r.read(); if(x.done)break; chunks.push(x.value); total+=x.value.length; }
+    var out=new Uint8Array(total),off=0;
+    chunks.forEach(function(c){out.set(c,off);off+=c.length;}); return out;
+  }
+  var b1=await decomp(m[1]),b2=await decomp(m[2]);
+  function bit(arr,i){ return (arr[i>>3]>>(i&7))&1; }
+  var friendOwned={},friendDupes={};
+  var maxBit=Math.min(b1.length,b2.length)*8;
+  for(var i=0;i<maxBit;i++){
+    if(bit(b1,i)) continue;
+    var code=_figuritasBitToCode(i); if(!code) continue;
+    friendOwned[code]=true;
+    if(bit(b2,i)) friendDupes[code]=1;
+  }
+  return {owned:friendOwned,dupes:friendDupes};
+}
+
 function _onQrDetected(raw){
   cerrarEscaner();
+  if(raw.includes('⋋~')){
+    _parseFiguritasQR(raw).then(function(fd){
+      window._pendingFriendQR=fd;
+      if(navigator.vibrate) navigator.vibrate(40);
+      toast('✅ QR de Figuritas leído — calculando cambios...');
+      setTimeout(abrirIntercambio,600);
+    }).catch(function(e){ toast('No se pudo leer el QR de Figuritas',true); console.warn(e); });
+    return;
+  }
   try{
     var m=raw.match(/[?&]r=([^&\s]+)/);
     if(!m){ toast('QR no reconocido — ¿es de esta app?',true); return; }
