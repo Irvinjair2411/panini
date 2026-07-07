@@ -1684,14 +1684,30 @@ function _htmlIntercambio(){
     '<div id="xcResultado" class="xc-res" style="display:none"></div>'+
     '</div>';
 }
+function _qrDataToReporte(pd){
+  var repes={},faltan={};
+  Object.keys(pd.dupes||{}).forEach(function(code){
+    var m=String(code).match(/^([A-Za-z]+)(\d+)$/); if(!m) return;
+    var tid=m[1].toUpperCase(),num=parseInt(m[2],10);
+    if(!repes[tid]) repes[tid]=[]; repes[tid].push(num);
+  });
+  allSt().forEach(function(o){
+    if(!pd.owned[o.c]){
+      var num=numFromCode(o.c); if(num==null) return;
+      if(!faltan[o.tid]) faltan[o.tid]=[]; faltan[o.tid].push(num);
+    }
+  });
+  dedupeSort(repes); dedupeSort(faltan);
+  return {repes:repes,faltan:faltan,hasFaltan:true};
+}
 function abrirIntercambio(){
   document.getElementById('modalTitle').textContent='🤝 Intercambio';
   document.getElementById('modalBody').innerHTML=_htmlIntercambio();
   document.getElementById('modal').classList.add('open');
   if(window._pendingFriendQR){
-    var ta=document.getElementById('xcPega');
-    if(ta){ ta.value=window._pendingFriendQR; setTimeout(procesarReporteAmigo,300); }
+    var _pf=window._pendingFriendQR;
     window._pendingFriendQR=null;
+    setTimeout(function(){ renderResultadoCruce(cruzarIntercambio(_qrDataToReporte(_pf))); },300);
   }
 }
 function procesarReporteAmigo(){
