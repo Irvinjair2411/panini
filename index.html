@@ -1495,13 +1495,21 @@ function _sobreRender(){
 function generarReporteRepetidas(incluyeFaltan){
   const byTid={}; let totalRepes=0;
   for(const code in dupes){
-    if(!(dupes[code]>0)) continue;
+    const cnt=dupes[code]; if(!(cnt>0)) continue;
     const tid=findTid(code); if(!tid) continue;
     const num=numFromCode(code); if(num==null) continue;
-    (byTid[tid]=byTid[tid]||[]).push(num); totalRepes++;
+    (byTid[tid]=byTid[tid]||[]).push({num,cnt});
+    totalRepes+=cnt;
   }
-  let out=`♻️ REPETIDAS para cambio (${totalRepes})\n`;
-  out+=linesFromByTid(byTid);
+  const ao=_albumOrd();
+  const repeTids=Object.keys(byTid).sort((a,b)=>(ao[a]??999)-(ao[b]??999));
+  let repes='';
+  for(const tid of repeTids){
+    const m=tidMeta(tid); const flag=m.flag?' '+m.flag:'';
+    const items=byTid[tid].slice().sort((a,b)=>a.num-b.num);
+    repes+=`${tid}${flag}: ${items.map(({num,cnt})=>cnt>1?`${num}×${cnt}`:String(num)).join(', ')}\n`;
+  }
+  let out=`♻️ REPETIDAS para cambio (${totalRepes})\n`+repes;
   if(incluyeFaltan){
     const fByTid={}; let totalFalt=0;
     allSt().forEach(({c,tid})=>{ if(!owned[c]){ const num=numFromCode(c); if(num==null) return;
